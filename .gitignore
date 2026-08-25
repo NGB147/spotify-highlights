@@ -1,0 +1,10 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local archive of the prototype, not needed in the repo
+Spotify.zip
+
+# Netlify CLI state
+.netlify/

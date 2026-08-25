@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spotify Highlights — AI Podcast Chapters &amp; Smart Recaps | DPM Group 3</title>
+<meta name="description" content="Working prototype of Spotify Highlights: AI chaptering, personalised recaps, smart skip learning and segment-level recommendations for long-form podcasts." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#06120E;
+    --panel:#0B1F17;
+    --panel2:#102A20;
+    --raise:#16362A;
+    --line:rgba(255,255,255,.10);
+    --line-strong:rgba(255,255,255,.20);
+    --green:#1DB954;
+    --green-bright:#41E27F;
+    --green-dim:#146F35;
+    --amber:#E9B44C;
+    --text:#E9F2EC;
+    --muted:#8CA79A;
+    --muted-2:#638073;
+    --display:"Instrument Serif",Georgia,serif;
+    --body:"Inter",system-ui,-apple-system,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,monospace;
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1100px 620px at 12% -8%, #10402C 0%, transparent 60%),
+      radial-gradient(900px 520px at 92% 4%, #0C3325 0%, transparent 62%),
+      var(--ink);
+    color:var(--text);
+    font-family:var(--body);
+    font-size:15px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:26px 20px 80px}
+  a{color:var(--green-bright)}
+
+  /* ---------- masthead ---------- */
+  .masthead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:26px}
+  .eyebrow{
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--green-bright);
+    font-weight:600;display:flex;align-items:center;gap:10px
+  }
+  h1{font-family:var(--display);font-weight:400;font-size:clamp(38px,6vw,60px);line-height:1;margin:10px 0 8px;letter-spacing:.4px}
+  h1 em{font-style:italic;color:var(--green-bright)}
+  .dek{color:var(--muted);max-width:56ch;margin:0}
+  .eq{display:flex;align-items:flex-end;gap:3px;height:20px}
+  .eq i{width:4px;background:var(--green-bright);border-radius:2px;display:block;animation:bounce 1.4s ease-in-out infinite}
+  .eq i:nth-child(1){height:8px;animation-delay:0s}
+  .eq i:nth-child(2){height:16px;animation-delay:.18s}
+  .eq i:nth-child(3){height:11px;animation-delay:.36s}
+  .eq i:nth-child(4){height:20px;animation-delay:.1s}
+  .eq i:nth-child(5){height:9px;animation-delay:.5s}
+  @keyframes bounce{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1)}}
+  .badge{
+    border:1px solid var(--line-strong);border-radius:999px;padding:7px 14px;font-size:11px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--muted);white-space:nowrap
+  }
+
+  /* ---------- mode switch ---------- */
+  .modebar{
+    display:flex;gap:6px;background:rgba(0,0,0,.34);border:1px solid var(--line);
+    padding:5px;border-radius:999px;width:max-content;margin:0 0 18px
+  }
+  .modebar button{
+    font:inherit;font-size:13px;font-weight:600;color:var(--muted);background:none;border:0;
+    padding:8px 18px;border-radius:999px;cursor:pointer;transition:.18s
+  }
+  .modebar button[aria-pressed="true"]{background:var(--green);color:#04150C}
+  .modebar button:hover{color:var(--text)}
+  .modebar button[aria-pressed="true"]:hover{color:#04150C}
+
+  /* ---------- layout ---------- */
+  .grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px;align-items:start}
+  .card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--r);padding:20px}
+  .card + .card{margin-top:18px}
+  .card h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0 0 4px;letter-spacing:.3px}
+  .label{font-size:10.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--green-bright);font-weight:600;margin-bottom:10px}
+
+  /* ---------- episode picker ---------- */
+  .eplist{display:flex;flex-direction:column;gap:8px}
+  .ep{
+    display:flex;gap:12px;align-items:center;text-align:left;width:100%;
+    background:rgba(255,255,255,.03);border:1px solid transparent;border-radius:10px;padding:10px;
+    cursor:pointer;color:inherit;font:inherit;transition:.16s
+  }
+  .ep:hover{background:rgba(255,255,255,.07)}
+  .ep[aria-pressed="true"]{border-color:var(--green);background:rgba(29,185,84,.12)}
+  .art{width:46px;height:46px;border-radius:8px;flex:none;display:grid;place-items:center;font-family:var(--display);font-size:20px;color:#04150C}
+  .ep b{display:block;font-size:13.5px;font-weight:600;line-height:1.3}
+  .ep span{font-size:11.5px;color:var(--muted)}
+
+  /* ---------- player ---------- */
+  .now{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px}
+  .now .art{width:64px;height:64px;font-size:26px}
+  .now h3{margin:2px 0 3px;font-size:17px;font-weight:600;line-height:1.3}
+  .now p{margin:0;color:var(--muted);font-size:12.5px}
+  .tag{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 6px;margin-left:6px}
+
+  .wave{
+    display:flex;align-items:center;gap:1.5px;height:82px;width:100%;cursor:pointer;
+    padding:0;border:0;background:none;position:relative;touch-action:none
+  }
+  .wave b{flex:1;border-radius:1.5px;min-height:3px;opacity:.28;transition:opacity .1s linear}
+  .wave b.played{opacity:1}
+  .wave.plain b{background:var(--muted-2)!important;opacity:.42}
+  .wave.plain b.played{opacity:.85}
+  .playhead{position:absolute;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 10px rgba(255,255,255,.6);pointer-events:none}
+  .waveWrap{position:relative;margin-top:6px}
+  .chapstrip{display:flex;gap:2px;margin-top:6px;height:4px}
+  .chapstrip i{border-radius:2px;display:block}
+
+  .timerow{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:8px}
+  .controls{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .btn{
+    font:inherit;font-weight:600;font-size:13px;border-radius:999px;padding:10px 18px;cursor:pointer;
+    border:1px solid var(--line-strong);background:rgba(255,255,255,.05);color:var(--text);transition:.16s
+  }
+  .btn:hover{background:rgba(255,255,255,.11)}
+  .btn.primary{background:var(--green);border-color:var(--green);color:#04150C}
+  .btn.primary:hover{background:var(--green-bright);border-color:var(--green-bright)}
+  .btn.play{width:46px;height:46px;padding:0;display:grid;place-items:center;font-size:15px}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn:focus-visible,.ep:focus-visible,.modebar button:focus-visible,.tabbtn:focus-visible,.chap:focus-visible,.wave:focus-visible,.sw:focus-visible{outline:2px solid var(--green-bright);outline-offset:3px}
+
+  .hint{font-size:11.5px;color:var(--muted-2);margin-top:10px}
+
+  /* ---------- analyse pipeline ---------- */
+  .pipe{margin-top:16px;border:1px dashed var(--line-strong);border-radius:10px;padding:14px;display:none}
+  .pipe.on{display:block}
+  .pipe .step{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted);padding:3px 0;font-family:var(--mono)}
+  .pipe .step.done{color:var(--green-bright)}
+  .pipe .step.active{color:var(--text)}
+  .bar{height:4px;background:rgba(255,255,255,.09);border-radius:99px;overflow:hidden;margin-top:10px}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green-dim),var(--green-bright));transition:width .25s linear}
+
+  /* ---------- chapters ---------- */
+  .chaps{display:flex;flex-direction:column;gap:6px;max-height:none}
+  .chap{
+    display:grid;grid-template-columns:62px 1fr;gap:12px;align-items:start;text-align:left;width:100%;
+    background:rgba(255,255,255,.03);border:1px solid transparent;border-left:3px solid transparent;
+    border-radius:8px;padding:10px 12px;cursor:pointer;color:inherit;font:inherit;transition:.16s
+  }
+  .chap:hover{background:rgba(255,255,255,.07)}
+  .chap.current{background:rgba(29,185,84,.13);border-color:rgba(29,185,84,.4)}
+  .chap time{font-family:var(--mono);font-size:11.5px;color:var(--muted);padding-top:2px}
+  .chap b{font-size:13.5px;font-weight:600;display:block;line-height:1.35}
+  .chap p{margin:3px 0 0;font-size:12.5px;color:var(--muted);line-height:1.45}
+  .pill{display:inline-block;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:7px;vertical-align:1.5px}
+  .pill.ad{background:rgba(233,180,76,.16);color:var(--amber)}
+  .pill.key{background:rgba(29,185,84,.18);color:var(--green-bright)}
+
+  /* ---------- tabs ---------- */
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto}
+  .tabbtn{
+    font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);background:none;border:0;
+    border-bottom:2px solid transparent;padding:9px 12px;cursor:pointer;white-space:nowrap
+  }
+  .tabbtn[aria-selected="true"]{color:var(--text);border-bottom-color:var(--green)}
+  .panel[hidden]{display:none}
+
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 14px}
+  .chip{
+    font:inherit;font-size:12px;font-weight:500;border-radius:999px;padding:7px 13px;cursor:pointer;
+    border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);transition:.16s
+  }
+  .chip[aria-pressed="true"]{background:rgba(29,185,84,.16);border-color:var(--green);color:var(--text)}
+  .chip:hover{color:var(--text)}
+
+  .recap{
+    background:rgba(0,0,0,.28);border:1px solid var(--line);border-left:3px solid var(--green);
+    border-radius:10px;padding:16px;font-size:14px;line-height:1.65
+  }
+  .recap .meta{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:9px;letter-spacing:.04em}
+  .speaking{animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(65,226,127,.35)}50%{box-shadow:0 0 0 7px rgba(65,226,127,0)}}
+
+  .skiprow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .skiprow:last-of-type{border-bottom:0}
+  .skiprow div{flex:1;min-width:0}
+  .skiprow b{font-size:13px;font-weight:600;display:block}
+  .skiprow span{font-size:11.5px;color:var(--muted);font-family:var(--mono)}
+  .sw{
+    width:42px;height:24px;border-radius:99px;border:1px solid var(--line-strong);background:rgba(255,255,255,.06);
+    position:relative;cursor:pointer;flex:none;transition:.18s;padding:0
+  }
+  .sw::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:.18s}
+  .sw[aria-pressed="true"]{background:var(--green);border-color:var(--green)}
+  .sw[aria-pressed="true"]::after{left:20px;background:#04150C}
+
+  .saved{
+    display:flex;align-items:baseline;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)
+  }
+  .saved strong{font-family:var(--display);font-size:38px;line-height:1;color:var(--green-bright)}
+  .saved span{font-size:12.5px;color:var(--muted)}
+
+  .picks{display:flex;flex-direction:column;gap:9px}
+  .pick{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .pick b{font-size:13.5px;display:block}
+  .pick .src{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:2px}
+  .pick .why{font-size:12px;color:var(--green-bright);margin-top:7px}
+
+  /* ---------- today / plain state ---------- */
+  .today{border:1px solid var(--line);border-radius:10px;padding:18px;background:rgba(0,0,0,.22)}
+  .today p{color:var(--muted);font-size:13px;margin:0 0 10px}
+  .today .blob{height:9px;background:rgba(255,255,255,.06);border-radius:99px;margin-bottom:7px}
+  .today .blob.short{width:62%}
+
+  /* ---------- PM panel ---------- */
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+  .metric{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:14px}
+  .metric .k{font-family:var(--display);font-size:30px;line-height:1.05;color:var(--green-bright)}
+  .metric .n{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.4}
+  .metric .b{font-family:var(--mono);font-size:10.5px;color:var(--muted-2);margin-top:6px}
+  .fw{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:14px}
+  .fw div{border:1px solid var(--line);border-radius:10px;padding:13px}
+  .fw h4{margin:0 0 5px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--green-bright)}
+  .fw p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.5}
+
+  footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted-2);font-size:11.5px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:var(--raise);border:1px solid var(--line-strong);border-radius:999px;
+    padding:11px 20px;font-size:13px;opacity:0;pointer-events:none;transition:.28s;z-index:50;max-width:90vw
+  }
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:920px){
+    .grid{grid-template-columns:1fr}
+    .wave{height:64px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.001ms!important;transition-duration:.001ms!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <div class="eyebrow"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span> Spotify · concept prototype</div>
+      <h1>Spotify <em>Highlights</em></h1>
+      <p class="dek">A 107-minute podcast episode, broken into chapters you can actually navigate — plus a recap tuned to what you usually listen to. Click through it below.</p>
+    </div>
+    <div class="badge">Digital Product Management · Group 3</div>
+  </header>
+
+  <div class="modebar" role="group" aria-label="Compare experiences">
+    <button id="modeToday" aria-pressed="false">Spotify today</button>
+    <button id="modeNew" aria-pressed="true">With Highlights</button>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT -->
+    <div>
+      <section class="card">
+        <div class="label">Now playing</div>
+        <div class="now">
+          <div class="art" id="npArt">L</div>
+          <div>
+            <h3 id="npTitle">—</h3>
+            <p id="npMeta">—</p>
+          </div>
+        </div>
+
+        <div class="waveWrap">
+          <button class="wave" id="wave" aria-label="Episode timeline — click to seek"></button>
+          <div class="playhead" id="playhead" style="left:0"></div>
+        </div>
+        <div class="chapstrip" id="chapstrip" aria-hidden="true"></div>
+        <div class="timerow"><span id="tNow">0:00</span><span id="tLeft">—</span></div>
+
+        <div class="controls">
+          <button class="btn play" id="playBtn" aria-label="Play">▶</button>
+          <button class="btn primary" id="analyseBtn">Generate Highlights</button>
+          <button class="btn" id="resetBtn">Reset</button>
+          <span class="hint" style="margin:0">Playback runs at 60× so a full episode is watchable in class.</span>
+        </div>
+
+        <div class="pipe" id="pipe" aria-live="polite">
+          <div class="step" data-step="0">◦ Transcribing audio (Whisper-class ASR + speaker diarisation)</div>
+          <div class="step" data-step="1">◦ Detecting topic boundaries &amp; ad reads</div>
+          <div class="step" data-step="2">◦ Summarising chapters and drafting recap</div>
+          <div class="bar"><i id="pipeBar"></i></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="label" id="chapLabel">Chapters</div>
+        <div id="chapEmpty" class="today">
+          <p><strong>No chapters yet.</strong> This is the episode as Spotify serves it today — one continuous 107-minute block with a two-line description.</p>
+          <div class="blob"></div><div class="blob short"></div>
+          <p style="margin-top:12px">Hit <strong>Generate Highlights</strong> to run the AI pass.</p>
+        </div>
+        <div class="chaps" id="chaps"></div>
+      </section>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <section class="card">
+        <div class="label">Episodes</div>
+        <div class="eplist" id="eplist"></div>
+      </section>
+
+      <section class="card">
+        <div class="tabs" role="tablist">
+          <button class="tabbtn" role="tab" id="tab-recap" aria-controls="p-recap" aria-selected="true">Recap</button>
+          <button class="tabbtn" role="tab" id="tab-skip" aria-controls="p-skip" aria-selected="false">Smart skip</button>
+          <button class="tabbtn" role="tab" id="tab-picks" aria-controls="p-picks" aria-selected="false">Follow-on</button>
+        </div>
+
+        <div class="panel" id="p-recap" role="tabpanel" aria-labelledby="tab-recap">
+          <p style="margin:0 0 6px;font-size:12.5px;color:var(--muted)">Recaps are written for what this listener actually finishes. Switch the listener to see the same episode summarised differently.</p>
+          <div class="chips" id="personas" role="group" aria-label="Listener profile"></div>
+          <div class="recap" id="recapBox">
+            <div class="meta" id="recapMeta">Run Generate Highlights to produce a recap.</div>
+            <div id="recapText" style="color:var(--muted)">The recap is built from the chapter summaries, weighted towards the topics this listener finishes most often.</div>
+          </div>
+          <div class="controls">
+            <button class="btn primary" id="speakBtn" disabled>▶ Play recap</button>
+            <button class="btn" id="stopBtn" disabled>Stop</button>
+          </div>
+          <p class="hint" id="ttsHint">Spoken with your browser's built-in voice — the production version would use Spotify's own synthesised host voice.</p>
+        </div>
+
+        <div class="panel" id="p-skip" role="tabpanel" aria-labelledby="tab-skip" hidden>
+          <p style="margin:0 0 12px;font-size:12.5px;color:var(--muted)">Segments this listener has historically skipped. Leave them on and playback jumps past them automatically.</p>
+          <div id="skips"></div>
+          <div class="saved">
+            <strong id="savedMin">0</strong>
+            <span>minutes skipped this episode<br><span id="savedNote" style="color:var(--muted-2)">out of 107 minutes total</span></span>
+          </div>
+        </div>
+
+        <div class="panel" id="p-picks" role="tabpanel" aria-labelledby="tab-picks" hidden>
+          <p style="margin:0 0 12px;font-size:12.5px;color:var(--muted)">Recommendations at <em>segment</em> level, not show level — matched to the chapters this listener finished rather than the shows they subscribe to.</p>
+          <div class="picks" id="picks"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <section class="card" style="margin-top:18px">
+    <div class="label">What it moves</div>
+    <h2>The metrics this feature is built to shift</h2>
+    <p style="margin:6px 0 16px;color:var(--muted);font-size:13px;max-width:70ch">Illustrative targets for the pilot, not reported Spotify figures. Each one is the measurable version of a pain from the value proposition canvas on slide 6.</p>
+    <div class="metrics">
+      <div class="metric"><div class="k">+18%</div><div class="n">Episode completion rate on shows over 45 minutes</div><div class="b">primary success metric</div></div>
+      <div class="metric"><div class="k">−41%</div><div class="n">Drop-off inside the first five minutes</div><div class="b">chapters answer "is this worth it?"</div></div>
+      <div class="metric"><div class="k">2.4×</div><div class="n">Starts on episodes longer than 90 minutes</div><div class="b">unlocks the long tail of the catalogue</div></div>
+      <div class="metric"><div class="k">−6 min</div><div class="n">Median time-to-first-useful-moment</div><div class="b">counter-metric: ad completion rate</div></div>
+    </div>
+    <div class="fw">
+      <div><h4>Jobs to be done</h4><p>"When I come across a long podcast episode, I want to quickly tell if it's worth my time and jump to the parts I care about, so I don't have to gamble an hour to find out."</p></div>
+      <div><h4>Kano</h4><p>Delighter. Nobody asks for chapters on a podcast today, so absence costs nothing — but presence changes how the catalogue feels to use.</p></div>
+      <div><h4>RICE</h4><p>Reach high (podcast browsing is near-universal), impact high, confidence medium-high on existing transcription work, effort medium at catalogue scale.</p></div>
+      <div><h4>Riskiest assumption</h4><p>That listeners trust an AI chapter boundary enough to skip on it. Test first on a 5% cohort of shows over 60 minutes, measuring completion, not clicks.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Prototype for classroom demonstration · Group 3, Digital Product Management. Not affiliated with or endorsed by Spotify. Shows, episodes and listening data are fictional.</span>
+    <span>Atul · Nikhil · Rishita · Romila · Rutisha · Vartika</span>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+
+/* ============ DATA (fictional shows) ============ */
+const EPISODES = [
+  {
+    id:"lg142", initial:"L", hue:"linear-gradient(140deg,#41E27F,#0F7A3C)",
+    show:"The Long Game", title:"Ep. 142 — Why D2C brands stall at ₹100 crore",
+    host:"with Meera Iyer", dur:6420,
+    chapters:[
+      {s:0,   e:210, t:"Cold open and housekeeping", tags:["misc"], sum:"Intro music, sponsor thanks and a note about the live show in Bengaluru."},
+      {s:210, e:360, t:"Ad read — banking sponsor", tags:["ad"], ad:true, sum:"90-second host-read spot for a business banking product."},
+      {s:360, e:1080,t:"The ₹100 crore wall: what actually breaks", tags:["strategy"], key:true, sum:"Growth stalls are almost never a demand problem — they are a channel concentration problem that shows up two quarters late."},
+      {s:1080,e:1980,t:"Unit economics after paid acquisition dries up", tags:["numbers"], key:true, sum:"Contribution margin holds only while blended CAC stays under a third of first-order value; most brands cross that line without noticing."},
+      {s:1980,e:2640,t:"Case: a haircare brand's retail pivot", tags:["stories"], key:true, sum:"A founder moves 40% of volume into general trade in eleven months, and what it cost her in gross margin to do it."},
+      {s:2640,e:2820,t:"Ad read — hiring platform", tags:["ad"], ad:true, sum:"Second host-read spot, mid-roll."},
+      {s:2820,e:3720,t:"Why founders misread repeat rate", tags:["numbers"], key:true, sum:"Cohort repeat rate flatters you when discounting is heavy; the honest measure is second purchase at full price within 90 days."},
+      {s:3720,e:4620,t:"Building a pricing-power moat", tags:["strategy"], key:true, sum:"Pricing power comes from a product claim a competitor cannot copy in one season, not from brand spend."},
+      {s:4620,e:5280,t:"Hiring your first real CXO", tags:["stories"], sum:"When to bring in an operator, why the first one usually fails, and how equity conversations go wrong."},
+      {s:5280,e:5940,t:"Listener questions and tangents", tags:["misc"], sum:"A long digression about cricket, then three listener questions on inventory financing."},
+      {s:5940,e:6420,t:"Closing thoughts and next week", tags:["misc"], sum:"Recap of the three takeaways and a trailer for next week's guest."}
+    ],
+    picks:[
+      {t:"The margin math behind quick commerce",src:"Signal & Noise · Ep. 91 · 14 min segment",why:"You finished the unit economics chapter here"},
+      {t:"How a spice brand priced against a giant",src:"Built Different · Ep. 28 · 19 min segment",why:"Matches the pricing-power chapter you replayed"},
+      {t:"Second-purchase cohorts, explained slowly",src:"The Retention Room · Ep. 12 · 22 min segment",why:"Same topic as the repeat-rate chapter"},
+      {t:"When your first COO doesn't work out",src:"Founders Off Record · Ep. 55 · 26 min segment",why:"You usually finish founder-story chapters"}
+    ]
+  },
+  {
+    id:"sn87", initial:"S", hue:"linear-gradient(140deg,#7BD8FF,#0E5C8A)",
+    show:"Signal & Noise", title:"Ep. 87 — The AI hype cycle, measured",
+    host:"with Devika Rao and Aman Shetty", dur:4980,
+    chapters:[
+      {s:0,   e:180, t:"Opening banter", tags:["misc"], sum:"Hosts catch up and set the question for the episode."},
+      {s:180, e:330, t:"Ad read — cloud sponsor", tags:["ad"], ad:true, sum:"Mid-length host-read spot."},
+      {s:330, e:1200,t:"What the deployment data actually says", tags:["numbers"], key:true, sum:"Enterprise pilots are up sharply but production deployments lag by roughly four quarters, and the gap is widening."},
+      {s:1200,e:2040,t:"Where the productivity gains are real", tags:["strategy"], key:true, sum:"Measured gains cluster in support, code review and document drafting — narrow tasks with a cheap verification step."},
+      {s:2040,e:2820,t:"The evaluation problem nobody solves", tags:["numbers"], key:true, sum:"Most teams ship without an evaluation set, so they cannot tell a model regression from a prompt change."},
+      {s:2820,e:2970,t:"Ad read — analytics sponsor", tags:["ad"], ad:true, sum:"Second spot, mid-roll."},
+      {s:2970,e:3900,t:"A CTO on killing two of three pilots", tags:["stories"], key:true, sum:"A candid account of shutting down projects that demoed well and delivered nothing."},
+      {s:3900,e:4560,t:"What we'd watch for next year", tags:["strategy"], sum:"Three indicators the hosts think separate durable adoption from noise."},
+      {s:4560,e:4980,t:"Wrap and listener mail", tags:["misc"], sum:"Closing thoughts and two letters."}
+    ],
+    picks:[
+      {t:"Building an eval set from scratch",src:"The Retention Room · Ep. 30 · 17 min segment",why:"You finished the evaluation chapter here"},
+      {t:"Support automation, measured honestly",src:"The Long Game · Ep. 138 · 21 min segment",why:"Matches the productivity-gains chapter"},
+      {t:"Why pilots die at procurement",src:"Built Different · Ep. 31 · 15 min segment",why:"You usually finish enterprise-adoption chapters"},
+      {t:"A CIO's kill criteria",src:"Founders Off Record · Ep. 60 · 24 min segment",why:"Same shape as the CTO interview you replayed"}
+    ]
+  },
+  {
+    id:"bd33", initial:"B", hue:"linear-gradient(140deg,#E9B44C,#8A5A0E)",
+    show:"Built Different", title:"Ep. 33 — Rebuilding a supply chain in 90 days",
+    host:"with Karan Vasudev", dur:3660,
+    chapters:[
+      {s:0,   e:150, t:"Intro and guest bio", tags:["misc"], sum:"Host introduces the guest and the crisis that starts the story."},
+      {s:150, e:900, t:"The week three suppliers walked", tags:["stories"], key:true, sum:"How a single port delay cascaded into a total sourcing failure across three categories."},
+      {s:900, e:1050,t:"Ad read — logistics sponsor", tags:["ad"], ad:true, sum:"Host-read spot."},
+      {s:1050,e:1860,t:"Dual sourcing versus holding inventory", tags:["numbers"], key:true, sum:"The working-capital trade-off, run with real numbers on a ₹200 crore book."},
+      {s:1860,e:2640,t:"Rebuilding vendor trust after a default", tags:["strategy"], key:true, sum:"Why paying early to the smallest vendor first bought more resilience than any contract clause."},
+      {s:2640,e:3240,t:"What he'd do differently", tags:["stories"], sum:"Three decisions the guest would reverse, in order of regret."},
+      {s:3240,e:3660,t:"Closing", tags:["misc"], sum:"Takeaways and next episode."}
+    ],
+    picks:[
+      {t:"Working capital when growth is lumpy",src:"The Long Game · Ep. 129 · 18 min segment",why:"You finished the dual-sourcing chapter"},
+      {t:"Vendor terms that survive a bad quarter",src:"Signal & Noise · Ep. 74 · 13 min segment",why:"Matches the vendor-trust chapter"},
+      {t:"The port delay that broke a season",src:"Founders Off Record · Ep. 48 · 25 min segment",why:"Same story shape as this episode"},
+      {t:"Inventory financing, plainly",src:"The Retention Room · Ep. 19 · 16 min segment",why:"You replayed the working-capital section"}
+    ]
+  }
+];
+
+const PERSONAS = [
+  {id:"strategy", label:"Strategy listener",  order:["strategy","stories","numbers"], line:"finishes framework and positioning chapters"},
+  {id:"numbers",  label:"Numbers listener",   order:["numbers","strategy","stories"], line:"finishes anything with real figures in it"},
+  {id:"stories",  label:"Story listener",     order:["stories","strategy","numbers"], line:"finishes founder interviews and cases"}
+];
+
+const CHAP_COLORS = ["#41E27F","#1DB954","#2FCB86","#17A34A","#5BE7A0","#0F8B45"];
+
+/* ============ STATE ============ */
+const S = {
+  ep: EPISODES[0],
+  t: 0,
+  playing: false,
+  analysed: false,
+  mode: "new",           // "new" | "today"
+  persona: "strategy",
+  skipsOn: {},
+  savedSec: 0,
+  timer: null
+};
+
+/* ============ HELPERS ============ */
+const $ = id => document.getElementById(id);
+const fmt = s => { s=Math.max(0,Math.round(s)); const h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=s%60;
+  return h ? `${h}:${String(m).padStart(2,"0")}:${String(x).padStart(2,"0")}` : `${m}:${String(x).padStart(2,"0")}`; };
+const fmtShort = s => { const m=Math.round(s/60); return m>=60 ? `${Math.floor(m/60)}h ${m%60}m` : `${m} min`; };
+
+let toastTimer;
+function toast(msg){
+  const el=$("toast"); el.textContent=msg; el.classList.add("on");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove("on"),2600);
+}
+
+// deterministic pseudo-random so each episode's waveform is stable
+function rng(seed){ let x=seed; return ()=>{ x=(x*1664525+1013904223)%4294967296; return x/4294967296; }; }
+
+/* ============ RENDER: episode list ============ */
+function renderEpisodes(){
+  const box=$("eplist"); box.innerHTML="";
+  EPISODES.forEach(ep=>{
+    const b=document.createElement("button");
+    b.className="ep"; b.type="button";
+    b.setAttribute("aria-pressed", ep.id===S.ep.id);
+    b.innerHTML=`<span class="art" style="background:${ep.hue}">${ep.initial}</span>
+      <span><b>${ep.title}</b><span>${ep.show} · ${fmtShort(ep.dur)}</span></span>`;
+    b.onclick=()=>loadEpisode(ep);
+    box.appendChild(b);
+  });
+}
+
+/* ============ RENDER: waveform ============ */
+const BARS=170;
+function renderWave(){
+  const wave=$("wave"), strip=$("chapstrip");
+  wave.innerHTML=""; strip.innerHTML="";
+  const rand=rng(S.ep.id.split("").reduce((a,c)=>a+c.charCodeAt(0),7)*97);
+  const showChaps = S.analysed && S.mode==="new";
+  wave.classList.toggle("plain", !showChaps);
+
+  for(let i=0;i<BARS;i++){
+    const t=(i/BARS)*S.ep.dur;
+    const ch=S.ep.chapters.findIndex(c=>t>=c.s&&t<c.e);
+    const base=0.28+rand()*0.72;
+    const env=0.55+0.45*Math.sin(i/6.5+rand()*0.5);
+    const b=document.createElement("b");
+    b.style.height=Math.max(8, base*env*100)+"%";
+    const c=S.ep.chapters[ch<0?0:ch];
+    b.style.background = c && c.ad ? "var(--amber)" : CHAP_COLORS[(ch<0?0:ch)%CHAP_COLORS.length];
+    wave.appendChild(b);
+  }
+  // chapter strip under the wave
+  if(showChaps){
+    strip.style.display="flex";
+    S.ep.chapters.forEach((c,i)=>{
+      const seg=document.createElement("i");
+      seg.style.flex=(c.e-c.s);
+      seg.style.background = c.ad ? "rgba(233,180,76,.75)" : CHAP_COLORS[i%CHAP_COLORS.length];
+      seg.title=c.t;
+      strip.appendChild(seg);
+    });
+  } else strip.style.display="none";
+  paintProgress();
+}
+
+function paintProgress(){
+  const bars=$("wave").children, ratio=S.t/S.ep.dur;
+  const cut=Math.floor(ratio*BARS);
+  for(let i=0;i<bars.length;i++) bars[i].classList.toggle("played", i<=cut);
+  $("playhead").style.left=(ratio*100)+"%";
+  $("tNow").textContent=fmt(S.t);
+  $("tLeft").textContent="−"+fmt(S.ep.dur-S.t);
+}
+
+/* ============ RENDER: chapters ============ */
+function renderChapters(){
+  const box=$("chaps"), empty=$("chapEmpty");
+  const show = S.analysed && S.mode==="new";
+  empty.style.display = show ? "none" : "block";
+  box.style.display = show ? "flex" : "none";
+  $("chapLabel").textContent = show ? `Chapters · ${S.ep.chapters.length} detected` : "Chapters";
+  if(!show){ box.innerHTML=""; return; }
+
+  box.innerHTML="";
+  S.ep.chapters.forEach((c,i)=>{
+    const b=document.createElement("button");
+    b.type="button"; b.className="chap";
+    b.style.borderLeftColor = c.ad ? "var(--amber)" : CHAP_COLORS[i%CHAP_COLORS.length];
+    b.innerHTML=`<time>${fmt(c.s)}</time>
+      <span><b>${c.t}${c.ad?'<span class="pill ad">ad read</span>':''}${c.key?'<span class="pill key">key</span>':''}</b>
+      <p>${c.sum}</p></span>`;
+    b.onclick=()=>{ seek(c.s); toast(`Jumped to “${c.t}”`); };
+    box.appendChild(b);
+  });
+  markCurrentChapter();
+}
+
+function markCurrentChapter(){
+  const kids=$("chaps").children;
+  const idx=S.ep.chapters.findIndex(c=>S.t>=c.s&&S.t<c.e);
+  for(let i=0;i<kids.length;i++) kids[i].classList.toggle("current", i===idx);
+}
+
+/* ============ RENDER: recap ============ */
+function renderPersonas(){
+  const box=$("personas"); box.innerHTML="";
+  PERSONAS.forEach(p=>{
+    const b=document.createElement("button");
+    b.type="button"; b.className="chip";
+    b.setAttribute("aria-pressed", p.id===S.persona);
+    b.textContent=p.label;
+    b.onclick=()=>{ S.persona=p.id; renderPersonas(); renderRecap(); renderSkips(); renderPicks();
+      if(S.analysed) toast(`Recap rewritten for the ${p.label.toLowerCase()}`); };
+    box.appendChild(b);
+  });
+}
+
+function recapChapters(){
+  const p=PERSONAS.find(x=>x.id===S.persona);
+  const scored=S.ep.chapters
+    .filter(c=>!c.ad && c.tags[0]!=="misc")
+    .map(c=>{ const rank=p.order.indexOf(c.tags[0]); return {c, score:(rank<0?9:rank) - (c.key?0.5:0)}; })
+    .sort((a,b)=>a.score-b.score || a.c.s-b.c.s)
+    .slice(0,3)
+    .sort((a,b)=>a.c.s-b.c.s)
+    .map(x=>x.c);
+  return scored;
+}
+
+function recapText(){
+  const p=PERSONAS.find(x=>x.id===S.persona);
+  const picks=recapChapters();
+  const lead=`${S.ep.host.replace(/^with /,"")} on ${S.ep.show}. Here are the three parts you'd normally listen to, in order.`;
+  const body=picks.map((c,i)=>`${i===0?"First":i===1?"Then":"Finally"}, at ${fmt(c.s)} — ${c.t.toLowerCase()}. ${c.sum}`).join(" ");
+  const tail=`Everything else is ${S.ep.chapters.filter(c=>c.ad).length} ad reads and the usual opening. Start at ${fmt(picks[0].s)}.`;
+  return {lead, body, tail, picks};
+}
+
+function renderRecap(){
+  const box=$("recapText"), meta=$("recapMeta");
+  if(!S.analysed || S.mode==="today"){
+    meta.textContent = S.mode==="today" ? "Not available today — Spotify shows the publisher's description only." : "Run Generate Highlights to produce a recap.";
+    box.style.color="var(--muted)";
+    box.textContent = S.mode==="today"
+      ? "Publisher description: “A wide-ranging conversation about growth, margins and the things nobody tells you.” No timestamps, no structure, 107 minutes."
+      : "The recap is built from the chapter summaries, weighted towards the topics this listener finishes most often.";
+    $("speakBtn").disabled=true; $("stopBtn").disabled=true;
+    return;
+  }
+  const r=recapText();
+  const words=(r.lead+" "+r.body+" "+r.tail).split(/\s+/).length;
+  const secs=Math.round(words/2.6);
+  const p=PERSONAS.find(x=>x.id===S.persona);
+  meta.textContent=`${Math.floor(secs/60)}:${String(secs%60).padStart(2,"0")} recap · ${fmtShort(S.ep.dur)} episode · listener ${p.line}`;
+  box.style.color="var(--text)";
+  box.textContent=`${r.lead} ${r.body} ${r.tail}`;
+  $("speakBtn").disabled=false;
+}
+
+/* ============ RENDER: skips ============ */
+function renderSkips(){
+  const box=$("skips"); box.innerHTML="";
+  if(!S.analysed || S.mode==="today"){
+    box.innerHTML=`<p style="color:var(--muted);font-size:13px;margin:0">Nothing to show yet — skip suggestions come from the chapter pass. ${S.mode==="today"?"Today you scrub the bar and hope.":""}</p>`;
+    updateSaved(); return;
+  }
+  const last=S.ep.chapters.length-1;
+  const candidates=S.ep.chapters.filter((c,i)=>(c.ad || c.tags[0]==="misc") && i!==last);
+  candidates.forEach((c,i)=>{
+    const key=c.s;
+    if(!(key in S.skipsOn)) S.skipsOn[key]=true;
+    const row=document.createElement("div");
+    row.className="skiprow";
+    const reason = c.ad ? "Skipped on 8 of your last 10 episodes" : "You scrub past opening segments most times";
+    row.innerHTML=`<div><b>${c.t}</b><span>${fmt(c.s)}–${fmt(c.e)} · ${Math.round((c.e-c.s)/60)} min · ${reason}</span></div>`;
+    const sw=document.createElement("button");
+    sw.type="button"; sw.className="sw"; sw.setAttribute("aria-pressed",String(S.skipsOn[key]));
+    sw.setAttribute("aria-label",`Auto-skip ${c.t}`);
+    sw.onclick=()=>{ S.skipsOn[key]=!S.skipsOn[key]; sw.setAttribute("aria-pressed",String(S.skipsOn[key])); };
+    row.appendChild(sw);
+    box.appendChild(row);
+  });
+  updateSaved();
+}
+
+function updateSaved(){
+  $("savedMin").textContent=Math.round(S.savedSec/60);
+  $("savedNote").textContent=`out of ${Math.round(S.ep.dur/60)} minutes total`;
+}
+
+/* ============ RENDER: picks ============ */
+function renderPicks(){
+  const box=$("picks"); box.innerHTML="";
+  if(!S.analysed || S.mode==="today"){
+    box.innerHTML=`<p style="color:var(--muted);font-size:13px;margin:0">Today Spotify recommends whole shows. Segment-level picks need the chapter index first.</p>`;
+    return;
+  }
+  S.ep.picks.forEach(p=>{
+    const d=document.createElement("div");
+    d.className="pick";
+    d.innerHTML=`<b>${p.t}</b><div class="src">${p.src}</div><div class="why">↳ ${p.why}</div>`;
+    box.appendChild(d);
+  });
+}
+
+/* ============ PLAYBACK ============ */
+const SPEED=60; // demo speed multiplier
+function tick(){
+  S.t += SPEED*0.1;
+  if(S.analysed && S.mode==="new"){
+    for(const c of S.ep.chapters){
+      if(S.skipsOn[c.s] && S.t>=c.s && S.t<c.e-1){
+        S.savedSec += (c.e-S.t);
+        S.t=c.e;
+        toast(`Skipped “${c.t}” — ${Math.round((c.e-c.s)/60)} min`);
+        updateSaved();
+        break;
+      }
+    }
+  }
+  if(S.t>=S.ep.dur){ S.t=S.ep.dur; pause(); toast("Episode finished"); }
+  paintProgress(); markCurrentChapter();
+}
+function play(){ if(S.playing) return; S.playing=true; $("playBtn").textContent="❚❚"; $("playBtn").setAttribute("aria-label","Pause"); S.timer=setInterval(tick,100); }
+function pause(){ S.playing=false; $("playBtn").textContent="▶"; $("playBtn").setAttribute("aria-label","Play"); clearInterval(S.timer); }
+function seek(t){ S.t=Math.max(0,Math.min(S.ep.dur,t)); paintProgress(); markCurrentChapter(); }
+
+/* ============ ANALYSE PIPELINE ============ */
+let running=false;
+function analyse(){
+  if(running) return;
+  if(S.mode==="today"){ toast("Switch to “With Highlights” first"); return; }
+  running=true;
+  S.analysed=false; renderChapters(); renderRecap(); renderSkips(); renderPicks(); renderWave();
+  const pipe=$("pipe"), bar=$("pipeBar"), steps=[...pipe.querySelectorAll(".step")];
+  pipe.classList.add("on");
+  steps.forEach(s=>s.className="step");
+  $("analyseBtn").disabled=true;
+  const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const total=reduce?600:3400;
+  const marks=[.42,.76,1];
+  let p=0, start=Date.now();
+  const iv=setInterval(()=>{
+    p=Math.min(1,(Date.now()-start)/total);
+    bar.style.width=(p*100)+"%";
+    steps.forEach((s,i)=>{
+      s.classList.toggle("done", p>=marks[i]);
+      s.classList.toggle("active", p<marks[i] && (i===0||p>=marks[i-1]));
+      s.textContent=(p>=marks[i]?"● ":"◦ ")+s.textContent.slice(2);
+    });
+    if(p>=1){
+      clearInterval(iv); running=false;
+      S.analysed=true; S.savedSec=0; S.skipsOn={};
+      $("analyseBtn").disabled=false;
+      $("analyseBtn").textContent="Re-run Highlights";
+      renderWave(); renderChapters(); renderRecap(); renderSkips(); renderPicks();
+      setTimeout(()=>pipe.classList.remove("on"), reduce?200:1400);
+      toast(`${S.ep.chapters.length} chapters detected in ${fmtShort(S.ep.dur)} of audio`);
+    }
+  },80);
+}
+
+/* ============ TEXT TO SPEECH ============ */
+function speak(){
+  if(!("speechSynthesis" in window)){ toast("This browser can't speak — read the recap above"); return; }
+  const r=recapText();
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(`${r.lead} ${r.body} ${r.tail}`);
+  u.rate=1.02; u.pitch=1;
+  const v=window.speechSynthesis.getVoices().find(v=>/en[-_]/i.test(v.lang));
+  if(v) u.voice=v;
+  u.onend=()=>{ $("recapBox").classList.remove("speaking"); $("stopBtn").disabled=true; };
+  window.speechSynthesis.speak(u);
+  $("recapBox").classList.add("speaking");
+  $("stopBtn").disabled=false;
+}
+function stopSpeak(){
+  if("speechSynthesis" in window) window.speechSynthesis.cancel();
+  $("recapBox").classList.remove("speaking"); $("stopBtn").disabled=true;
+}
+
+/* ============ MODE + EPISODE ============ */
+function setMode(m){
+  S.mode=m;
+  $("modeToday").setAttribute("aria-pressed", m==="today");
+  $("modeNew").setAttribute("aria-pressed", m==="new");
+  $("analyseBtn").disabled = (m==="today");
+  renderWave(); renderChapters(); renderRecap(); renderSkips(); renderPicks();
+  toast(m==="today" ? "Spotify as it works today — one long block" : "Highlights on");
+}
+
+function loadEpisode(ep){
+  pause(); stopSpeak();
+  S.ep=ep; S.t=0; S.analysed=false; S.savedSec=0; S.skipsOn={};
+  $("npArt").textContent=ep.initial; $("npArt").style.background=ep.hue;
+  $("npTitle").textContent=ep.title;
+  $("npMeta").innerHTML=`${ep.show} · ${ep.host} <span class="tag">${fmtShort(ep.dur)}</span>`;
+  $("analyseBtn").textContent="Generate Highlights";
+  $("pipe").classList.remove("on");
+  renderEpisodes(); renderWave(); renderChapters(); renderRecap(); renderSkips(); renderPicks();
+}
+
+/* ============ TABS ============ */
+function initTabs(){
+  const btns=[...document.querySelectorAll(".tabbtn")];
+  btns.forEach(b=>{
+    b.onclick=()=>{
+      btns.forEach(x=>{
+        const on=x===b;
+        x.setAttribute("aria-selected",String(on));
+        $(x.getAttribute("aria-controls")).hidden=!on;
+      });
+    };
+  });
+}
+
+/* ============ WIRE UP ============ */
+$("playBtn").onclick=()=>S.playing?pause():play();
+$("analyseBtn").onclick=analyse;
+$("resetBtn").onclick=()=>{ loadEpisode(S.ep); toast("Reset — ready to demo again"); };
+$("speakBtn").onclick=speak;
+$("stopBtn").onclick=stopSpeak;
+$("modeToday").onclick=()=>setMode("today");
+$("modeNew").onclick=()=>setMode("new");
+$("wave").onclick=e=>{
+  const r=$("wave").getBoundingClientRect();
+  seek(((e.clientX-r.left)/r.width)*S.ep.dur);
+};
+$("wave").onkeydown=e=>{
+  if(e.key==="ArrowRight"){ seek(S.t+60); e.preventDefault(); }
+  if(e.key==="ArrowLeft"){ seek(S.t-60); e.preventDefault(); }
+};
+document.addEventListener("keydown",e=>{
+  if(e.code==="Space" && !/INPUT|TEXTAREA|BUTTON/.test(document.activeElement.tagName)){
+    e.preventDefault(); S.playing?pause():play();
+  }
+});
+if("speechSynthesis" in window) window.speechSynthesis.getVoices();
+
+initTabs();
+renderPersonas();
+loadEpisode(EPISODES[0]);
+</script>
+</body>
+</html>
