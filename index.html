@@ -10,38 +10,54 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#06120E;
-    --panel:#0B1F17;
-    --panel2:#102A20;
-    --raise:#16362A;
-    --line:rgba(255,255,255,.10);
-    --line-strong:rgba(255,255,255,.20);
+    --ink:#000000;
+    --panel:#0D0D0D;
+    --panel2:#181818;
+    --raise:#242424;
+    --line:rgba(255,255,255,.09);
+    --line-strong:rgba(255,255,255,.18);
     --green:#1DB954;
-    --green-bright:#41E27F;
-    --green-dim:#146F35;
+    --green-bright:#1ED760;
+    --green-dim:#12833B;
+    --green-deep:#0A3D20;
     --amber:#E9B44C;
-    --text:#E9F2EC;
-    --muted:#8CA79A;
-    --muted-2:#638073;
+    --text:#FFFFFF;
+    --muted:#A7A7A7;
+    --muted-2:#6E6E6E;
     --display:"Instrument Serif",Georgia,serif;
     --body:"Inter",system-ui,-apple-system,sans-serif;
     --mono:"JetBrains Mono",ui-monospace,monospace;
     --r:14px;
+    --shadow-lift:0 18px 40px -18px rgba(0,0,0,.9);
+    --glow:0 0 0 1px rgba(30,215,96,.35), 0 10px 34px -12px rgba(30,215,96,.45);
+    --ease:cubic-bezier(.22,1,.36,1);
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{
-    background:
-      radial-gradient(1100px 620px at 12% -8%, #10402C 0%, transparent 60%),
-      radial-gradient(900px 520px at 92% 4%, #0C3325 0%, transparent 62%),
-      var(--ink);
+    background:var(--ink);
     color:var(--text);
     font-family:var(--body);
     font-size:15px;
     line-height:1.55;
     -webkit-font-smoothing:antialiased;
     min-height:100vh;
+    position:relative;
   }
+  /* Spotify-style top wash: green bleeding out of the header into black */
+  body::before{
+    content:"";position:fixed;inset:0 0 auto 0;height:620px;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(900px 460px at 8% -14%, rgba(30,215,96,.20) 0%, transparent 64%),
+      radial-gradient(760px 420px at 88% -8%, rgba(29,185,84,.11) 0%, transparent 62%),
+      linear-gradient(180deg, rgba(18,60,36,.55) 0%, transparent 78%);
+  }
+  /* fine grain so the flat black reads as a surface, not a void */
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='.035'/></svg>");
+  }
+  .wrap{position:relative;z-index:1}
   .wrap{max-width:1200px;margin:0 auto;padding:26px 20px 80px}
   a{color:var(--green-bright)}
 
@@ -240,8 +256,245 @@
     .grid{grid-template-columns:1fr}
     .wave{height:64px}
   }
+  /* ==================================================================
+     PREMIUM LAYER — depth, motion and the Spotify black/green identity.
+     Kept as a trailing block so the base rules above stay readable.
+     ================================================================== */
+
+  ::selection{background:rgba(30,215,96,.3);color:#fff}
+  ::-webkit-scrollbar{width:11px;height:11px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:#2A2A2A;border-radius:99px;border:3px solid #000}
+  ::-webkit-scrollbar-thumb:hover{background:#3E3E3E}
+
+  /* ---------- masthead ---------- */
+  h1{text-shadow:0 2px 30px rgba(0,0,0,.6)}
+  h1 em{
+    background:linear-gradient(96deg,var(--green-bright),#8CF0B4 55%,var(--green));
+    -webkit-background-clip:text;background-clip:text;color:transparent
+  }
+  .eyebrow{text-shadow:0 0 22px rgba(30,215,96,.35)}
+  .badge{
+    background:rgba(255,255,255,.04);backdrop-filter:blur(10px);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06)
+  }
+  .dek{font-size:15.5px;line-height:1.6}
+
+  /* ---------- sticky mode switch, so the compare toggle is always reachable ---------- */
+  .modebar{
+    position:sticky;top:10px;z-index:30;
+    background:rgba(12,12,12,.72);backdrop-filter:blur(16px) saturate(160%);
+    border-color:rgba(255,255,255,.12);
+    box-shadow:0 10px 30px -14px rgba(0,0,0,.95)
+  }
+  .modebar button{transition:color .2s var(--ease), background .2s var(--ease), transform .12s var(--ease)}
+  .modebar button:active{transform:scale(.96)}
+  .modebar button[aria-pressed="true"]{
+    background:var(--green-bright);color:#000;
+    box-shadow:0 4px 18px -4px rgba(30,215,96,.6)
+  }
+
+  /* ---------- cards ---------- */
+  .card{
+    background:linear-gradient(180deg,#1C1C1C 0%,var(--panel2) 42%,#141414 100%);
+    box-shadow:var(--shadow-lift), inset 0 1px 0 rgba(255,255,255,.05);
+    transition:border-color .3s var(--ease), box-shadow .3s var(--ease), transform .3s var(--ease);
+    position:relative;overflow:hidden
+  }
+  /* hairline of green light along the top edge of every card */
+  .card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(30,215,96,.5),transparent);
+    opacity:.55;transition:opacity .3s var(--ease)
+  }
+  .card:hover{border-color:rgba(255,255,255,.16);box-shadow:0 24px 54px -20px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.07)}
+  .card:hover::before{opacity:1}
+  .card h2{font-size:26px}
+  .label{
+    display:inline-flex;align-items:center;gap:7px;
+    text-shadow:0 0 18px rgba(30,215,96,.3)
+  }
+  .label::before{
+    content:"";width:5px;height:5px;border-radius:50%;background:var(--green-bright);
+    box-shadow:0 0 9px var(--green-bright)
+  }
+
+  /* ---------- artwork ---------- */
+  .art{
+    box-shadow:0 8px 22px -8px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.28);
+    font-weight:600;transition:transform .3s var(--ease)
+  }
+  .now .art{border-radius:10px}
+  .ep:hover .art{transform:scale(1.06) rotate(-2deg)}
+
+  /* ---------- episode picker ---------- */
+  .ep{transition:background .2s var(--ease), border-color .2s var(--ease), transform .2s var(--ease)}
+  .ep:hover{transform:translateX(3px)}
+  .ep[aria-pressed="true"]{
+    background:linear-gradient(90deg,rgba(30,215,96,.16),rgba(30,215,96,.05));
+    box-shadow:inset 0 0 0 1px rgba(30,215,96,.3)
+  }
+
+  /* ---------- player controls ---------- */
+  .btn{transition:background .18s var(--ease), transform .14s var(--ease), box-shadow .18s var(--ease), border-color .18s var(--ease)}
+  .btn:hover:not(:disabled){transform:scale(1.04)}
+  .btn:active:not(:disabled){transform:scale(.97)}
+  .btn.primary{
+    background:var(--green-bright);border-color:var(--green-bright);
+    box-shadow:0 6px 22px -6px rgba(30,215,96,.62);letter-spacing:.02em
+  }
+  .btn.primary:hover:not(:disabled){box-shadow:0 10px 30px -6px rgba(30,215,96,.8)}
+  .btn.play{
+    width:54px;height:54px;font-size:17px;
+    background:var(--green-bright);border-color:var(--green-bright);color:#000;
+    box-shadow:0 8px 26px -6px rgba(30,215,96,.65)
+  }
+  .btn.play:hover{background:#25E86B;transform:scale(1.07)}
+  .btn.play.playing{animation:livepulse 2.4s ease-in-out infinite}
+  @keyframes livepulse{
+    0%,100%{box-shadow:0 8px 26px -6px rgba(30,215,96,.55)}
+    50%{box-shadow:0 8px 34px -4px rgba(30,215,96,.95)}
+  }
+
+  /* ---------- waveform ---------- */
+  /* vertical padding only — the playhead is positioned in % of this box,
+     so any horizontal padding would desync it from the bars inside */
+  .waveWrap{
+    padding:10px 0;border-radius:12px;
+    background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01));
+    border:1px solid rgba(255,255,255,.06);
+    transition:border-color .3s var(--ease), box-shadow .3s var(--ease)
+  }
+  .waveWrap:hover{border-color:rgba(30,215,96,.3);box-shadow:0 0 34px -14px rgba(30,215,96,.5)}
+  .wave b{transition:opacity .12s linear, filter .12s linear, transform .12s var(--ease);transform-origin:center}
+  .wave b.played{filter:drop-shadow(0 0 4px rgba(30,215,96,.55))}
+  /* the bars under the cursor lift slightly — makes scrubbing feel physical */
+  .wave b.near{transform:scaleY(1.16)}
+  .wave b.inchap{opacity:.95;filter:drop-shadow(0 0 6px rgba(255,255,255,.35))}
+  .playhead{
+    width:2px;background:#fff;border-radius:2px;
+    box-shadow:0 0 14px rgba(255,255,255,.85), 0 0 30px rgba(30,215,96,.5);
+    transition:left .1s linear
+  }
+  .playhead::after{
+    content:"";position:absolute;top:-4px;left:50%;transform:translateX(-50%);
+    width:9px;height:9px;border-radius:50%;background:#fff;
+    box-shadow:0 0 12px rgba(255,255,255,.9)
+  }
+  /* hover readout that follows the cursor across the timeline */
+  .scrubTip{
+    position:absolute;bottom:calc(100% + 10px);transform:translateX(-50%);
+    background:rgba(20,20,20,.97);border:1px solid rgba(255,255,255,.16);
+    border-radius:9px;padding:7px 11px;font-size:11.5px;white-space:nowrap;
+    pointer-events:none;opacity:0;transition:opacity .16s var(--ease);z-index:20;
+    box-shadow:0 12px 30px -10px rgba(0,0,0,.95);max-width:290px
+  }
+  .scrubTip.on{opacity:1}
+  .scrubTip b{display:block;font-size:12.5px;font-weight:600;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis}
+  .scrubTip time{font-family:var(--mono);font-size:11px;color:var(--green-bright)}
+  .chapstrip i{transition:transform .2s var(--ease), filter .2s var(--ease);transform-origin:center bottom;cursor:pointer}
+  .chapstrip i:hover,.chapstrip i.lit{transform:scaleY(2.2);filter:brightness(1.35)}
+
+  .timerow{font-variant-numeric:tabular-nums}
+
+  /* ---------- pipeline ---------- */
+  .pipe{
+    background:rgba(0,0,0,.42);border-color:rgba(30,215,96,.28);
+    animation:fadeUp .35s var(--ease)
+  }
+  .pipe .step{transition:color .3s var(--ease), transform .3s var(--ease)}
+  .pipe .step.active{transform:translateX(4px)}
+  .pipe .step.done{text-shadow:0 0 14px rgba(30,215,96,.4)}
+  .bar{box-shadow:inset 0 1px 3px rgba(0,0,0,.6)}
+  .bar i{box-shadow:0 0 14px rgba(30,215,96,.75)}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------- chapters ---------- */
+  .chap{
+    transition:background .2s var(--ease), border-color .2s var(--ease), transform .2s var(--ease), box-shadow .2s var(--ease);
+    animation:chapIn .42s var(--ease) both
+  }
+  @keyframes chapIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  /* stagger the chapter list so it reads as "results arriving" after the AI pass */
+  .chap:nth-child(1){animation-delay:.00s}  .chap:nth-child(2){animation-delay:.04s}
+  .chap:nth-child(3){animation-delay:.08s}  .chap:nth-child(4){animation-delay:.12s}
+  .chap:nth-child(5){animation-delay:.16s}  .chap:nth-child(6){animation-delay:.20s}
+  .chap:nth-child(7){animation-delay:.24s}  .chap:nth-child(8){animation-delay:.28s}
+  .chap:nth-child(9){animation-delay:.32s}  .chap:nth-child(10){animation-delay:.36s}
+  .chap:nth-child(n+11){animation-delay:.40s}
+  .chap:hover{transform:translateX(4px);box-shadow:0 10px 26px -14px rgba(0,0,0,.95)}
+  .chap.current{
+    background:linear-gradient(90deg,rgba(30,215,96,.18),rgba(30,215,96,.04));
+    box-shadow:0 0 26px -12px rgba(30,215,96,.7)
+  }
+  .chap.current time{color:var(--green-bright)}
+  .pill.key{box-shadow:0 0 12px -3px rgba(30,215,96,.5)}
+
+  /* ---------- tabs ---------- */
+  .tabbtn{transition:color .2s var(--ease), border-color .2s var(--ease)}
+  .tabbtn[aria-selected="true"]{border-bottom-color:var(--green-bright);text-shadow:0 0 16px rgba(30,215,96,.4)}
+  .panel:not([hidden]){animation:fadeUp .3s var(--ease)}
+
+  /* ---------- chips ---------- */
+  .chip{transition:all .18s var(--ease)}
+  .chip:hover{transform:translateY(-1px);border-color:var(--line-strong)}
+  .chip[aria-pressed="true"]{
+    background:linear-gradient(180deg,rgba(30,215,96,.22),rgba(30,215,96,.1));
+    box-shadow:0 4px 16px -6px rgba(30,215,96,.5)
+  }
+
+  /* ---------- recap ---------- */
+  .recap{
+    background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,.3));
+    border-left-color:var(--green-bright);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04)
+  }
+
+  /* ---------- skip switches ---------- */
+  .sw{transition:background .22s var(--ease), border-color .22s var(--ease)}
+  .sw::after{transition:left .22s var(--ease), background .22s var(--ease)}
+  .sw[aria-pressed="true"]{background:var(--green-bright);border-color:var(--green-bright);box-shadow:0 0 16px -4px rgba(30,215,96,.7)}
+  .saved strong{
+    background:linear-gradient(180deg,#fff,var(--green-bright));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    font-variant-numeric:tabular-nums
+  }
+
+  /* ---------- picks ---------- */
+  .pick{transition:background .2s var(--ease), border-color .2s var(--ease), transform .2s var(--ease)}
+  .pick:hover{background:rgba(255,255,255,.06);border-color:rgba(30,215,96,.3);transform:translateY(-2px)}
+
+  /* ---------- metrics ---------- */
+  .metric{
+    background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.015));
+    transition:transform .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease)
+  }
+  .metric:hover{transform:translateY(-3px);border-color:rgba(30,215,96,.32);box-shadow:0 18px 36px -20px rgba(30,215,96,.5)}
+  .metric .k{
+    background:linear-gradient(170deg,#fff 6%,var(--green-bright) 92%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    font-variant-numeric:tabular-nums
+  }
+  .fw div{
+    background:rgba(255,255,255,.02);
+    transition:border-color .3s var(--ease), background .3s var(--ease)
+  }
+  .fw div:hover{border-color:rgba(30,215,96,.28);background:rgba(30,215,96,.05)}
+
+  /* ---------- toast ---------- */
+  .toast{
+    background:rgba(28,28,28,.97);backdrop-filter:blur(14px);
+    border-color:rgba(30,215,96,.35);
+    box-shadow:0 18px 44px -14px rgba(0,0,0,.95), 0 0 30px -14px rgba(30,215,96,.7)
+  }
+
+  @media (max-width:920px){
+    .modebar{width:100%;justify-content:center}
+    .btn.play{width:48px;height:48px}
+  }
   @media (prefers-reduced-motion:reduce){
     *{animation-duration:.001ms!important;transition-duration:.001ms!important}
+    .card:hover,.chap:hover,.ep:hover,.metric:hover,.pick:hover,.btn:hover:not(:disabled){transform:none!important}
   }
 </style>
 </head>
@@ -694,8 +947,8 @@ function tick(){
   if(S.t>=S.ep.dur){ S.t=S.ep.dur; pause(); toast("Episode finished"); }
   paintProgress(); markCurrentChapter();
 }
-function play(){ if(S.playing) return; S.playing=true; $("playBtn").textContent="❚❚"; $("playBtn").setAttribute("aria-label","Pause"); S.timer=setInterval(tick,100); }
-function pause(){ S.playing=false; $("playBtn").textContent="▶"; $("playBtn").setAttribute("aria-label","Play"); clearInterval(S.timer); }
+function play(){ if(S.playing) return; S.playing=true; $("playBtn").textContent="❚❚"; $("playBtn").setAttribute("aria-label","Pause"); $("playBtn").classList.add("playing"); S.timer=setInterval(tick,100); }
+function pause(){ S.playing=false; $("playBtn").textContent="▶"; $("playBtn").setAttribute("aria-label","Play"); $("playBtn").classList.remove("playing"); clearInterval(S.timer); }
 function seek(t){ S.t=Math.max(0,Math.min(S.ep.dur,t)); paintProgress(); markCurrentChapter(); }
 
 /* ============ ANALYSE PIPELINE ============ */
@@ -813,6 +1066,127 @@ if("speechSynthesis" in window) window.speechSynthesis.getVoices();
 initTabs();
 renderPersonas();
 loadEpisode(EPISODES[0]);
+
+/* ============ INTERACTION LAYER ============
+   Everything below is additive polish over the core prototype: a hover
+   readout on the timeline, drag-to-scrub, chapter↔waveform cross-highlight
+   and count-up metrics. All of it degrades to the base behaviour if a
+   listener never fires. */
+
+const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const waveEl = $("wave");
+const waveWrap = document.querySelector(".waveWrap");
+
+/* ---- hover readout that follows the cursor along the timeline ---- */
+const tip = document.createElement("div");
+tip.className = "scrubTip";
+tip.innerHTML = "<b></b><time></time>";
+waveWrap.appendChild(tip);
+const tipTitle = tip.querySelector("b"), tipTime = tip.querySelector("time");
+
+function pointFrom(e){
+  const r = waveEl.getBoundingClientRect();
+  const cx = (e.touches ? e.touches[0].clientX : e.clientX);
+  const x = Math.max(0, Math.min(r.width, cx - r.left));
+  return { x, w: r.width, t: (x / r.width) * S.ep.dur };
+}
+
+function showTip(e){
+  const { x, w, t } = pointFrom(e);
+  const chaptered = S.analysed && S.mode === "new";
+  const c = chaptered ? S.ep.chapters.find(c => t >= c.s && t < c.e) : null;
+  tipTitle.textContent = c ? c.t : "";
+  tipTitle.style.display = c ? "block" : "none";
+  tipTime.textContent = fmt(t) + (c && c.ad ? " · ad read" : c && c.key ? " · key chapter" : "");
+  tip.style.left = Math.max(70, Math.min(w - 70, x)) + "px";
+  tip.classList.add("on");
+  const bars = waveEl.children, idx = Math.round((x / w) * BARS);
+  for (let i = 0; i < bars.length; i++) bars[i].classList.toggle("near", Math.abs(i - idx) <= 2);
+}
+
+function clearTip(){
+  tip.classList.remove("on");
+  for (const b of waveEl.children) b.classList.remove("near");
+}
+
+waveEl.addEventListener("mousemove", showTip);
+waveEl.addEventListener("mouseleave", clearTip);
+
+/* ---- drag to scrub, so the timeline behaves like a real player ---- */
+let dragging = false;
+waveEl.addEventListener("mousedown", e => { dragging = true; seek(pointFrom(e).t); });
+window.addEventListener("mousemove", e => { if (dragging){ seek(pointFrom(e).t); showTip(e); } });
+window.addEventListener("mouseup", () => { dragging = false; });
+
+/* ---- chapter row hover lights up its stretch of the waveform ---- */
+function litRange(from, to){
+  const bars = waveEl.children;
+  for (let i = 0; i < bars.length; i++){
+    const t = (i / BARS) * S.ep.dur;
+    bars[i].classList.toggle("inchap", from !== null && t >= from && t < to);
+  }
+}
+
+$("chaps").addEventListener("mouseover", e => {
+  const row = e.target.closest(".chap");
+  if (!row) return;
+  const i = [...$("chaps").children].indexOf(row);
+  const c = S.ep.chapters[i];
+  if (!c) return;
+  litRange(c.s, c.e);
+  const seg = $("chapstrip").children[i];
+  if (seg) seg.classList.add("lit");
+});
+
+$("chaps").addEventListener("mouseleave", () => {
+  litRange(null, 0);
+  for (const s of $("chapstrip").children) s.classList.remove("lit");
+});
+
+/* ---- the chapter strip under the wave is clickable too ---- */
+$("chapstrip").addEventListener("click", e => {
+  const i = [...$("chapstrip").children].indexOf(e.target);
+  const c = S.ep.chapters[i];
+  if (!c) return;
+  seek(c.s);
+  toast(`Jumped to “${c.t}”`);
+});
+
+/* ---- metrics count up the first time the panel scrolls into view ---- */
+function countUp(el){
+  const m = el.textContent.trim().match(/^([^\d]*)([\d.]+)(.*)$/);
+  if (!m) return;
+  const [, prefix, numStr, suffix] = m;
+  const target = parseFloat(numStr);
+  const decimals = (numStr.split(".")[1] || "").length;
+  const settle = () => { el.textContent = prefix + target.toFixed(decimals) + suffix; };
+
+  // Never animate when motion is reduced or the tab is hidden: rAF is frozen
+  // while hidden, which would strand the number at zero on screen.
+  if (REDUCED || document.hidden){ settle(); return; }
+
+  const dur = 1100, start = performance.now();
+  let done = false;
+  const finish = () => { if (!done){ done = true; settle(); } };
+  setTimeout(finish, dur + 400);                   // safety net if frames stop
+
+  requestAnimationFrame(function frame(now){
+    if (done) return;
+    const p = Math.min(1, (now - start) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);          // ease-out cubic
+    el.textContent = prefix + (target * eased).toFixed(decimals) + suffix;
+    if (p < 1) requestAnimationFrame(frame); else finish();
+  });
+}
+
+if ("IntersectionObserver" in window){
+  const io = new IntersectionObserver(entries => {
+    for (const en of entries){
+      if (en.isIntersecting){ countUp(en.target); io.unobserve(en.target); }
+    }
+  }, { threshold: 0.6 });
+  document.querySelectorAll(".metric .k").forEach(el => io.observe(el));
+}
 </script>
 </body>
 </html>
