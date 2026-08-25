@@ -488,9 +488,150 @@
     box-shadow:0 18px 44px -14px rgba(0,0,0,.95), 0 0 30px -14px rgba(30,215,96,.7)
   }
 
+  /* ---------- surface switch (Podcasts / Music) ---------- */
+  .surfacebar{display:flex;gap:10px;margin:0 0 18px;flex-wrap:wrap}
+  .surfbtn{
+    display:flex;align-items:center;gap:12px;font:inherit;text-align:left;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+    border:1px solid var(--line);border-radius:13px;padding:12px 20px 12px 15px;color:var(--muted);
+    transition:all .22s var(--ease);min-width:196px
+  }
+  .surfbtn .sb-ico{
+    width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:15px;
+    background:rgba(255,255,255,.06);color:var(--muted);transition:all .22s var(--ease);flex:none
+  }
+  .surfbtn b{display:block;font-size:14.5px;font-weight:600;color:var(--text);line-height:1.25}
+  .surfbtn i{font-style:normal;font-size:11.5px;color:var(--muted)}
+  .surfbtn:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+  .surfbtn[aria-pressed="true"]{
+    border-color:rgba(30,215,96,.55);
+    background:linear-gradient(180deg,rgba(30,215,96,.16),rgba(30,215,96,.04));
+    box-shadow:0 10px 30px -14px rgba(30,215,96,.75)
+  }
+  .surfbtn[aria-pressed="true"] .sb-ico{background:var(--green-bright);color:#000;box-shadow:0 0 18px -4px rgba(30,215,96,.9)}
+  .surfbtn[aria-pressed="true"] i{color:var(--green-bright)}
+  .surfbtn:focus-visible{outline:2px solid var(--green-bright);outline-offset:3px}
+  .surface[hidden]{display:none}
+  .surface:not([hidden]){animation:fadeUp .34s var(--ease)}
+
+  /* ---------- DJ deck ---------- */
+  .djhead{display:flex;gap:15px;align-items:center;margin-bottom:16px}
+  .djhead h3{margin:0 0 3px;font-size:18px;font-weight:600}
+  .djhead p{margin:0;color:var(--muted);font-size:12.5px;max-width:52ch}
+  .djorb{
+    width:58px;height:58px;border-radius:50%;flex:none;display:grid;place-items:center;
+    background:radial-gradient(circle at 34% 30%,#1ED760,#0B5B2C 72%);
+    box-shadow:0 0 0 1px rgba(30,215,96,.4), 0 10px 30px -8px rgba(30,215,96,.65);
+    position:relative;gap:3px;grid-auto-flow:column;align-items:end;padding-bottom:20px
+  }
+  .djorb i{width:3px;height:9px;border-radius:2px;background:#04150C;display:block;opacity:.75}
+  .djorb.live i{animation:bounce 1s ease-in-out infinite}
+  .djorb.live i:nth-child(2){animation-delay:.15s}
+  .djorb.live i:nth-child(3){animation-delay:.3s}
+  .djorb.live i:nth-child(4){animation-delay:.45s}
+  .djorb.live{animation:livepulse 2.2s ease-in-out infinite}
+
+  /* ---------- setlist ---------- */
+  .setlist{display:flex;flex-direction:column;gap:7px}
+  .track{
+    display:grid;grid-template-columns:26px 1fr auto;gap:12px;align-items:center;
+    background:rgba(255,255,255,.03);border:1px solid transparent;border-left:3px solid var(--green-dim);
+    border-radius:9px;padding:11px 13px;transition:all .2s var(--ease);animation:chapIn .4s var(--ease) both
+  }
+  .track:hover{background:rgba(255,255,255,.07);transform:translateX(4px)}
+  .track.skipped{opacity:.4;border-left-color:var(--muted-2)}
+  .track.skipped .tname{text-decoration:line-through}
+  .track.drop{border-left-color:var(--amber);background:rgba(233,180,76,.07)}
+  .track.sponsor{border-left-color:#7BD8FF;background:rgba(123,216,255,.06)}
+  .tnum{font-family:var(--mono);font-size:11.5px;color:var(--muted-2);text-align:right}
+  .tname{font-size:13.5px;font-weight:600;line-height:1.3;display:block}
+  .tartist{font-size:11.5px;color:var(--muted)}
+  .tsay{font-size:12px;color:var(--green-bright);margin-top:5px;line-height:1.45;font-style:italic}
+  .track.drop .tsay{color:var(--amber)}
+  .tmeta{display:flex;align-items:center;gap:8px}
+  .tlen{font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+  .tskip{
+    font:inherit;font-size:11px;font-weight:600;border-radius:99px;padding:5px 11px;cursor:pointer;
+    border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);transition:all .18s var(--ease)
+  }
+  .tskip:hover{color:var(--text);border-color:var(--line-strong)}
+  .tskip:focus-visible{outline:2px solid var(--green-bright);outline-offset:2px}
+  .tier{
+    display:inline-block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    padding:2px 7px;border-radius:99px;margin-left:7px;vertical-align:1.5px
+  }
+  .tier.emerging{background:rgba(30,215,96,.18);color:var(--green-bright)}
+  .tier.rotation{background:rgba(255,255,255,.08);color:var(--muted)}
+  .tier.adjacent{background:rgba(255,255,255,.06);color:var(--muted-2)}
+  .tier.drop{background:rgba(233,180,76,.18);color:var(--amber)}
+  .tier.sponsor{background:rgba(123,216,255,.18);color:#7BD8FF}
+
+  /* ---------- set economics ---------- */
+  .econ{border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  .econrow{
+    display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+    padding:11px 13px;border-bottom:1px solid var(--line);font-size:12.5px
+  }
+  .econrow:last-child{border-bottom:0}
+  .econrow span{color:var(--muted)}
+  .econrow em{font-style:normal;color:var(--muted-2);font-size:11px}
+  .econrow b{font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .econrow b.pos{color:var(--green-bright)}
+  .econrow.total{background:rgba(30,215,96,.09)}
+  .econrow.total span{color:var(--text);font-weight:600}
+  .econrow.total b{color:var(--green-bright);font-size:16px}
+
+  .quota{margin-top:16px}
+  .quotatop{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:var(--muted);margin-bottom:7px}
+  .quotatop b{font-family:var(--mono);color:var(--text);font-size:14px}
+  .qbar{position:relative;height:8px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
+  .qbar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--green-dim),var(--green-bright));transition:width .5s var(--ease)}
+  .qfloor{position:absolute;top:-3px;bottom:-3px;left:30%;width:2px;background:rgba(255,255,255,.55);border-radius:2px}
+  .qbar.under i{background:linear-gradient(90deg,#8a5a1e,var(--amber))}
+
+  /* ---------- two-sided model ---------- */
+  .sides{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:13px}
+  .side{
+    border:1px solid var(--line);border-radius:12px;padding:16px;
+    background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.01));
+    transition:border-color .3s var(--ease), transform .3s var(--ease)
+  }
+  .side:hover{border-color:rgba(30,215,96,.3);transform:translateY(-3px)}
+  .side h4{
+    margin:0 0 11px;font-size:14px;font-weight:600;display:flex;justify-content:space-between;
+    align-items:baseline;gap:8px;padding-bottom:9px;border-bottom:1px solid var(--line)
+  }
+  .side h4 span{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--green-bright);font-weight:700}
+  .side ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+  .side li{font-size:12.5px;color:var(--muted);line-height:1.5}
+  .side li b{color:var(--text);font-weight:600}
+
+  /* ---------- flywheel ---------- */
+  .flywheel{
+    display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;margin-top:18px;padding:15px;
+    border:1px dashed var(--line-strong);border-radius:12px;background:rgba(0,0,0,.28)
+  }
+  .fw-step{
+    flex:1;min-width:150px;display:flex;align-items:center;gap:9px;font-size:12px;
+    color:var(--muted);line-height:1.35;transition:color .3s var(--ease)
+  }
+  .fw-step span{
+    width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;
+    background:rgba(30,215,96,.16);color:var(--green-bright);font-size:11px;font-weight:700;
+    font-family:var(--mono);transition:all .3s var(--ease)
+  }
+  .fw-step.lit{color:var(--text)}
+  .fw-step.lit span{background:var(--green-bright);color:#000;box-shadow:0 0 16px -2px rgba(30,215,96,.9)}
+  .fw-arrow{display:grid;place-items:center;color:var(--muted-2);font-size:15px;flex:none}
+  .fw-arrow.loop{color:var(--green-bright)}
+
   @media (max-width:920px){
     .modebar{width:100%;justify-content:center}
     .btn.play{width:48px;height:48px}
+    .surfbtn{flex:1;min-width:0}
+    .track{grid-template-columns:22px 1fr;row-gap:8px}
+    .tmeta{grid-column:2;justify-content:flex-end}
+    .fw-arrow{display:none}
   }
   @media (prefers-reduced-motion:reduce){
     *{animation-duration:.001ms!important;transition-duration:.001ms!important}
@@ -505,10 +646,23 @@
     <div>
       <div class="eyebrow"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span> Spotify · concept prototype</div>
       <h1>Spotify <em>Highlights</em></h1>
-      <p class="dek">A 107-minute podcast episode, broken into chapters you can actually navigate — plus a recap tuned to what you usually listen to. Click through it below.</p>
+      <p class="dek">One AI layer across both halves of Spotify: chapters and recaps that make long podcasts navigable, and a DJ that builds music sets nobody has to choose. Both feed the same two-sided model below.</p>
     </div>
     <div class="badge">Digital Product Management · Group 3</div>
   </header>
+
+  <nav class="surfacebar" role="group" aria-label="Choose surface">
+    <button id="surfPod" class="surfbtn" aria-pressed="true">
+      <span class="sb-ico">◫</span>
+      <span><b>Podcasts</b><i>Chapters &amp; recaps</i></span>
+    </button>
+    <button id="surfMusic" class="surfbtn" aria-pressed="false">
+      <span class="sb-ico">◉</span>
+      <span><b>Music</b><i>AI DJ</i></span>
+    </button>
+  </nav>
+
+  <div id="surface-pod" class="surface">
 
   <div class="modebar" role="group" aria-label="Compare experiences">
     <button id="modeToday" aria-pressed="false">Spotify today</button>
@@ -621,6 +775,184 @@
       <div><h4>Kano</h4><p>Delighter. Nobody asks for chapters on a podcast today, so absence costs nothing — but presence changes how the catalogue feels to use.</p></div>
       <div><h4>RICE</h4><p>Reach high (podcast browsing is near-universal), impact high, confidence medium-high on existing transcription work, effort medium at catalogue scale.</p></div>
       <div><h4>Riskiest assumption</h4><p>That listeners trust an AI chapter boundary enough to skip on it. Test first on a 5% cohort of shows over 60 minutes, measuring completion, not clicks.</p></div>
+    </div>
+  </section>
+
+  </div><!-- /surface-pod -->
+
+  <div id="surface-music" class="surface" hidden>
+    <div class="grid">
+      <!-- LEFT: the DJ deck -->
+      <div>
+        <section class="card">
+          <div class="label">AI DJ</div>
+          <div class="djhead">
+            <div class="djorb" id="djOrb" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+            <div>
+              <h3 id="djTitle">Nothing queued</h3>
+              <p id="djLine">Pick the moment you're listening in, and the DJ builds a set around it.</p>
+            </div>
+          </div>
+
+          <div class="chips" id="contexts" role="group" aria-label="Listening context"></div>
+
+          <div class="controls">
+            <button class="btn primary" id="djBuild">Build my set</button>
+            <button class="btn" id="djSpeakBtn" disabled>▶ Hear the DJ</button>
+            <button class="btn" id="djStopBtn" disabled>Stop</button>
+            <button class="btn" id="djReset">Reset</button>
+          </div>
+          <p class="hint">The DJ voice is your browser's speech engine. Production would use Spotify's synthesised host voice, the same one the podcast recap uses.</p>
+
+          <div class="pipe" id="djPipe" aria-live="polite">
+            <div class="step" data-step="0">◦ Reading context signals (time, device, last 20 skips)</div>
+            <div class="step" data-step="1">◦ Matching catalogue on tempo, texture and your rotation</div>
+            <div class="step" data-step="2">◦ Writing commentary and setting the running order</div>
+            <div class="bar"><i id="djBar"></i></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="label" id="setLabel">The set</div>
+          <div id="setEmpty" class="today">
+            <p><strong>No set yet.</strong> Today you either pick a playlist yourself or take an algorithmic mix with no explanation attached to it.</p>
+            <div class="blob"></div><div class="blob short"></div>
+            <p style="margin-top:12px">Hit <strong>Build my set</strong> to run the DJ.</p>
+          </div>
+          <div class="setlist" id="setlist"></div>
+        </section>
+      </div>
+
+      <!-- RIGHT: the money -->
+      <div>
+        <section class="card">
+          <div class="label">Set economics · live</div>
+          <p style="margin:0 0 14px;font-size:12.5px;color:var(--muted)">Updates as the set changes. Skip a track and watch who stops getting paid — this is the whole argument in one panel.</p>
+
+          <div class="econ">
+            <div class="econrow">
+              <span>Qualifying music streams <em>(played past 30s)</em></span>
+              <b id="ecStreams">0</b>
+            </div>
+            <div class="econrow">
+              <span>Base artist payout <em>@ ₹0.34 / stream</em></span>
+              <b id="ecBase">₹0.00</b>
+            </div>
+            <div class="econrow">
+              <span>Emerging-artist bonus <em>1.5×, funded by the sponsor slot</em></span>
+              <b id="ecBonus" class="pos">₹0.00</b>
+            </div>
+            <div class="econrow">
+              <span>Chapter drop → publisher <em>@ ₹1.10, sold on CPM not per-stream</em></span>
+              <b id="ecPub" class="pos">₹0.00</b>
+            </div>
+            <div class="econrow total">
+              <span>Total to rights-holders from this set</span>
+              <b id="ecTotal">₹0.00</b>
+            </div>
+          </div>
+
+          <div class="quota">
+            <div class="quotatop">
+              <span>Share of <em>music slots</em> from artists under 50k listeners</span>
+              <b id="ecQuotaPct">0%</b>
+            </div>
+            <div class="qbar"><i id="ecQuotaBar"></i><span class="qfloor" title="30% floor"></span></div>
+            <p class="hint" id="ecQuotaNote">The 30% floor is a product rule, not an accident — it is what makes this a supply-side growth feature instead of a rich-get-richer loop.</p>
+          </div>
+
+          <div class="saved">
+            <strong id="ecListener">0</strong>
+            <span>minutes of listening with zero decisions<br><span style="color:var(--muted-2)" id="ecListenerNote">the value the listener is actually paying for</span></span>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="label">Where the money comes from</div>
+          <div class="picks">
+            <div class="pick">
+              <b>One disclosed sponsor slot per set</b>
+              <div class="src">New ad inventory · audio-native · labelled in the UI</div>
+              <div class="why">↳ Funds the emerging-artist bonus pool, so the bonus is not taken from other artists' royalties</div>
+            </div>
+            <div class="pick">
+              <b>DJ and Highlights are Premium-gated</b>
+              <div class="src">Free tier gets chapters; skip-ads and the DJ need Premium</div>
+              <div class="why">↳ Turns the ad-skip revenue problem into a conversion lever</div>
+            </div>
+            <div class="pick">
+              <b>Chapter drops inside music sets</b>
+              <div class="src">A single podcast chapter, placed by context</div>
+              <div class="why">↳ Sends music listeners into podcasts, the higher-margin catalogue</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <section class="card" style="margin-top:18px">
+      <div class="label">What it moves</div>
+      <h2>The music side, measured</h2>
+      <p style="margin:6px 0 16px;color:var(--muted);font-size:13px;max-width:70ch">Illustrative pilot targets, not reported Spotify figures — the same caveat as the podcast panel.</p>
+      <div class="metrics">
+        <div class="metric"><div class="k">+27%</div><div class="n">Session length on days the DJ is used</div><div class="b">primary success metric</div></div>
+        <div class="metric"><div class="k">−34%</div><div class="n">Skip rate in the first three tracks</div><div class="b">the set earns trust early or not at all</div></div>
+        <div class="metric"><div class="k">3.1×</div><div class="n">First-time streams for artists under 50k listeners</div><div class="b">supplier-side growth metric</div></div>
+        <div class="metric"><div class="k">+9%</div><div class="n">Free-to-Premium conversion in the trial cohort</div><div class="b">counter-metric: royalty cost per hour</div></div>
+      </div>
+    </section>
+  </div><!-- /surface-music -->
+
+  <section class="card" id="twosided" style="margin-top:18px">
+    <div class="label">The business case</div>
+    <h2>Why both sides of the marketplace get paid</h2>
+    <p style="margin:6px 0 18px;color:var(--muted);font-size:13px;max-width:78ch">A feature that only delights listeners is a cost centre. This one is built so the supply side — artists, labels and podcast publishers — has a reason to want it too. That is what makes it defensible inside a company that has to keep both sides on the platform.</p>
+
+    <div class="sides">
+      <div class="side">
+        <h4>Listener <span>demand side</span></h4>
+        <ul>
+          <li><b>Gets:</b> zero-decision listening, roughly 6 minutes saved per long episode, and discovery that explains itself instead of feeling like a lottery.</li>
+          <li><b>Gives:</b> subscription revenue and richer preference signal — skips now carry a reason, not just a timestamp.</li>
+          <li><b>Growth lever:</b> both features sit behind Premium, so the value is felt exactly where the paywall is.</li>
+        </ul>
+      </div>
+      <div class="side">
+        <h4>Artists &amp; publishers <span>supply side</span></h4>
+        <ul>
+          <li><b>Gets:</b> a guaranteed 30% floor of every DJ set reserved for artists under 50k monthly listeners, paid at a 1.5× bonus rate, plus a new discovery surface for podcast publishers via chapter drops.</li>
+          <li><b>Gives:</b> catalogue supply and a reason to release on Spotify first.</li>
+          <li><b>Growth lever:</b> more long-tail artists earning means more catalogue, which is the only durable moat in streaming.</li>
+        </ul>
+      </div>
+      <div class="side">
+        <h4>Spotify <span>the platform</span></h4>
+        <ul>
+          <li><b>Gets:</b> Premium conversion, lower churn, a new sponsor-slot ad product, and discovery at a lower editorial cost per stream than human playlisting.</li>
+          <li><b>Gives:</b> inference cost and the bonus pool, both funded from the new sponsor inventory rather than the existing royalty pool.</li>
+          <li><b>Growth lever:</b> the DJ hands listeners to podcasts and Highlights hands them back — one loop, two catalogues.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="flywheel" id="flywheel">
+      <div class="fw-step"><span>1</span>More context signal per listener</div>
+      <div class="fw-arrow">→</div>
+      <div class="fw-step"><span>2</span>Sets and chapters get sharper</div>
+      <div class="fw-arrow">→</div>
+      <div class="fw-step"><span>3</span>Completion rises, so more streams qualify</div>
+      <div class="fw-arrow">→</div>
+      <div class="fw-step"><span>4</span>Long-tail artists actually earn</div>
+      <div class="fw-arrow">→</div>
+      <div class="fw-step"><span>5</span>Catalogue deepens, listeners stay</div>
+      <div class="fw-arrow loop">↺</div>
+    </div>
+
+    <div class="fw" style="margin-top:16px">
+      <div><h4>The honest caveat</h4><p>If the emerging-artist bonus were funded out of the existing royalty pool it would just move money between artists and solve nothing. It only works as growth if the sponsor slot pays for it — that dependency is the model's real load-bearing assumption.</p></div>
+      <div><h4>Riskiest assumption</h4><p>That advertisers will pay a premium for one disclosed, non-interruptive slot inside a DJ set. Test it before the royalty design, because everything on the supply side is funded by it.</p></div>
+      <div><h4>Why the two features ship together</h4><p>Separately they are two nice AI toys. Together the chaptering engine is what makes a podcast segment short enough for the DJ to play, which is what moves music listeners into podcasts.</p></div>
+      <div><h4>What would falsify it</h4><p>If chapter drops get skipped at a materially higher rate than music tracks, the cross-sell fails and the two features should be priced and judged separately.</p></div>
     </div>
   </section>
 
@@ -1057,7 +1389,7 @@ $("wave").onkeydown=e=>{
   if(e.key==="ArrowLeft"){ seek(S.t-60); e.preventDefault(); }
 };
 document.addEventListener("keydown",e=>{
-  if(e.code==="Space" && !/INPUT|TEXTAREA|BUTTON/.test(document.activeElement.tagName)){
+  if(e.code==="Space" && S.surface!=="music" && !/INPUT|TEXTAREA|BUTTON/.test(document.activeElement.tagName)){
     e.preventDefault(); S.playing?pause():play();
   }
 });
@@ -1187,6 +1519,317 @@ if ("IntersectionObserver" in window){
   }, { threshold: 0.6 });
   document.querySelectorAll(".metric .k").forEach(el => io.observe(el));
 }
+
+/* ==================================================================
+   MUSIC SIDE — AI DJ
+   Same pre-computed approach as the podcast half: the catalogue,
+   the commentary and the payout rates are all invented. What is real
+   is the *shape* of the argument — every economic number on screen is
+   derived live from the set you are looking at.
+   ================================================================== */
+
+const RATE = 0.34;          // ₹ per qualifying music stream — illustrative
+const PUB_RATE = 1.10;      // ₹ per qualified chapter play to the podcast publisher —
+                            // higher than a music stream because podcast ads are sold
+                            // on CPM, which is the whole reason the cross-sell pays
+const BONUS = 0.5;          // +50% on emerging artists, funded by the sponsor slot
+const QUOTA_FLOOR = 0.30;   // product rule: 30% of every set
+
+const CONTEXTS = [
+  { id:"commute", label:"Morning commute", line:"25 minutes, headphones, moving — front-load the hooks" },
+  { id:"focus",   label:"Deep work",       line:"90 minutes, low vocals, tempo that does not move much" },
+  { id:"workout", label:"Workout",         line:"45 minutes, BPM climbing to a peak then release" },
+  { id:"late",    label:"Late night",      line:"winding down, lower energy, longer tracks" }
+];
+
+const TRACKS = [
+  { t:"Neon Ghat",        a:"Ravi Kabir",        tier:"emerging", listeners:12400,  len:214, ctx:["commute","late"],
+    say:"Opening with something you have not heard. Ravi Kabir put this out three weeks ago and about twelve thousand people have found it." },
+  { t:"Second City Light", a:"Nadia Sen",        tier:"rotation", listeners:2140000, len:198, ctx:["commute","workout"],
+    say:"Back to something safe — you have finished this one nine times this month." },
+  { t:"Paper Weather",    a:"The Kalyan Set",    tier:"adjacent", listeners:410000,  len:243, ctx:["commute","focus","late"],
+    say:"Same producer as the last track, different band. That is usually a good bet for you." },
+  { t:"Slow Monsoon",     a:"Ilaa",              tier:"emerging", listeners:8900,   len:287, ctx:["late","focus"],
+    say:"Ilaa has under nine thousand monthly listeners. If you save this, you are early." },
+  { t:"Grid Runner",      a:"Basswala",          tier:"rotation", listeners:1870000, len:186, ctx:["workout","commute"],
+    say:"Lifting the tempo now — this is where your runs usually pick up." },
+  { t:"Held Note",        a:"Priya Anand",       tier:"adjacent", listeners:620000,  len:265, ctx:["focus","late"],
+    say:"No vocals for the next stretch, since you are working." },
+  { t:"Terracotta",       a:"Fold Theory",       tier:"emerging", listeners:31200,  len:232, ctx:["focus","commute"],
+    say:"Fold Theory are just over thirty thousand listeners and climbing quickly this month." },
+  { t:"Eleven Forty",     a:"Nadia Sen",         tier:"rotation", listeners:2140000, len:221, ctx:["late","commute"],
+    say:"You have never skipped this one. Not going to argue with that." },
+  { t:"Cadence Loss",     a:"Ustad Rehan Q",     tier:"emerging", listeners:4700,   len:305, ctx:["focus","late"],
+    say:"Four thousand listeners. This is the kind of thing the old algorithm would never have surfaced to you." },
+  { t:"Fever Pitch",      a:"Basswala",          tier:"rotation", listeners:1870000, len:178, ctx:["workout"],
+    say:"Peak of the set. After this we come back down." },
+  { t:"Copper Line",      a:"The Kalyan Set",    tier:"adjacent", listeners:410000,  len:256, ctx:["workout","commute"],
+    say:"Cooling off, but keeping the groove you were in." },
+  { t:"Anchor",           a:"Meher Dutt",        tier:"emerging", listeners:19800,  len:241, ctx:["workout","commute","focus"],
+    say:"Meher Dutt released this on Spotify first — which is exactly what the emerging slot is designed to reward." },
+  { t:"Redline",          a:"Kabini Youth",      tier:"emerging", listeners:22300,  len:196, ctx:["workout","commute"],
+    say:"Twenty-two thousand listeners, and half of those arrived through sets like this one." },
+  { t:"Sprint Theory",    a:"Ilaa",              tier:"emerging", listeners:8900,   len:188, ctx:["workout"],
+    say:"Ilaa again, faster this time — you held the last one to the end so I'm giving them a second slot." }
+];
+
+/* the one paid placement per set — always visible as sponsored */
+const SPONSOR = { t:"Long Way Around", a:"Ashwin & The Grid", tier:"sponsor", listeners:88000, len:227,
+  say:"This one is a paid placement, and you are being told so. The label bought the slot — that money funds the bonus pool below." };
+
+const D = { ctx:null, set:[], built:false, running:false };
+
+/* ---- context chips ---- */
+function renderContexts(){
+  const box = $("contexts"); box.innerHTML = "";
+  CONTEXTS.forEach(c => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip";
+    b.setAttribute("aria-pressed", c.id === (D.ctx && D.ctx.id));
+    b.textContent = c.label;
+    b.onclick = () => {
+      D.ctx = c; renderContexts();
+      $("djLine").textContent = c.line;
+      if (D.built) buildSet(true);
+    };
+    box.appendChild(b);
+  });
+}
+
+/* ---- pick the shortest key chapter as a podcast "drop" ---- */
+function chapterDrop(){
+  let best = null;
+  for (const ep of EPISODES){
+    for (const c of ep.chapters){
+      if (!c.key) continue;
+      if (!best || (c.e - c.s) < (best.c.e - best.c.s)) best = { ep, c };
+    }
+  }
+  if (!best) return null;
+  return {
+    t: best.c.t, a: `${best.ep.show} · chapter`, tier:"drop", listeners:0,
+    len: best.c.e - best.c.s, drop:true, ep:best.ep, chap:best.c,
+    say:`And one thing from your podcasts — this is a single ${Math.round((best.c.e-best.c.s)/60)} minute chapter, not the ${fmtShort(best.ep.dur)} episode. That is only playable here because the chaptering pass exists.`
+  };
+}
+
+/* ---- build the running order ---- */
+function composeSet(){
+  const pool = TRACKS.filter(t => t.ctx.includes(D.ctx.id));
+  const emerging = pool.filter(t => t.tier === "emerging");
+  const rest     = pool.filter(t => t.tier !== "emerging");
+
+  // Clear the floor by construction, counting the sponsor slot as a music slot
+  // (it is one) but not the chapter drop (that is a podcast, paid differently).
+  // Deliberately built with headroom: one skip should not break the floor,
+  // but two or three should — that is the point the panel is making.
+  const target = 6;
+  const needEmerging = Math.max(3, Math.ceil((target + 1) * QUOTA_FLOOR));
+  const chosen = [
+    ...emerging.slice(0, needEmerging),
+    ...rest.slice(0, Math.max(2, target - needEmerging))
+  ];
+
+  // open on something familiar, then alternate so discovery is spread out
+  const fam = chosen.filter(t => t.tier !== "emerging");
+  const nw  = chosen.filter(t => t.tier === "emerging");
+  const order = [];
+  while (fam.length || nw.length){
+    if (fam.length) order.push(fam.shift());
+    if (nw.length)  order.push(nw.shift());
+  }
+
+  const drop = chapterDrop();
+  if (drop) order.splice(Math.min(3, order.length), 0, drop);
+  order.splice(Math.min(2, order.length), 0, { ...SPONSOR });
+
+  return order.map(t => ({ ...t, skipped:false }));
+}
+
+/* ---- render ---- */
+function renderSet(){
+  const box = $("setlist"), empty = $("setEmpty");
+  empty.style.display = D.built ? "none" : "block";
+  box.style.display   = D.built ? "flex" : "none";
+  $("setLabel").textContent = D.built
+    ? `The set · ${D.set.filter(t => !t.skipped).length} of ${D.set.length} playing`
+    : "The set";
+  box.innerHTML = "";
+  if (!D.built) { updateEcon(); return; }
+
+  D.set.forEach((t, i) => {
+    const row = document.createElement("div");
+    row.className = "track" + (t.skipped ? " skipped" : "")
+      + (t.tier === "drop" ? " drop" : "") + (t.tier === "sponsor" ? " sponsor" : "");
+    const tierLabel = t.tier === "emerging" ? "under 50k" : t.tier === "drop" ? "chapter drop"
+      : t.tier === "sponsor" ? "sponsored" : t.tier === "rotation" ? "your rotation" : "adjacent";
+    row.innerHTML =
+      `<div class="tnum">${i + 1}</div>
+       <div>
+         <span class="tname">${t.t}<span class="tier ${t.tier}">${tierLabel}</span></span>
+         <span class="tartist">${t.a}${t.listeners ? " · " + t.listeners.toLocaleString("en-IN") + " monthly listeners" : ""}</span>
+         <div class="tsay">“${t.say}”</div>
+       </div>
+       <div class="tmeta"><span class="tlen">${fmt(t.len)}</span></div>`;
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "tskip";
+    btn.textContent = t.skipped ? "Undo" : "Skip";
+    btn.setAttribute("aria-label", `${t.skipped ? "Restore" : "Skip"} ${t.t}`);
+    btn.onclick = () => {
+      t.skipped = !t.skipped;
+      renderSet();
+      toast(t.skipped
+        ? `Skipped “${t.t}” — ${t.tier === "emerging" ? "an emerging artist just lost that payout" : "noted for the next set"}`
+        : `“${t.t}” back in the set`);
+    };
+    row.querySelector(".tmeta").appendChild(btn);
+    box.appendChild(row);
+  });
+  updateEcon();
+}
+
+/* ---- the money, derived from whatever is actually still in the set ---- */
+function updateEcon(){
+  const live = D.set.filter(t => !t.skipped);
+  // A chapter drop is a podcast play: it pays a publisher on an ad-backed
+  // CPM, not an artist on a per-stream royalty. Keeping the two apart is
+  // what makes the panel honest rather than just impressive.
+  const music = live.filter(t => t.tier !== "drop");
+  const drops = live.filter(t => t.tier === "drop");
+
+  const emerging = music.filter(t => t.tier === "emerging").length;
+  const base  = music.length * RATE;
+  const bonus = emerging * RATE * BONUS;
+  const pub   = drops.length * PUB_RATE;
+  const pct   = music.length ? emerging / music.length : 0;
+  const mins  = Math.round(live.reduce((a, t) => a + t.len, 0) / 60);
+
+  $("ecStreams").textContent = music.length;
+  $("ecBase").textContent    = "₹" + base.toFixed(2);
+  $("ecBonus").textContent   = "₹" + bonus.toFixed(2);
+  $("ecPub").textContent     = "₹" + pub.toFixed(2);
+  $("ecTotal").textContent   = "₹" + (base + bonus + pub).toFixed(2);
+  $("ecQuotaPct").textContent = Math.round(pct * 100) + "%";
+  $("ecQuotaBar").style.width = Math.min(100, pct * 100) + "%";
+  $("ecListener").textContent = mins;
+
+  const under = D.built && pct < QUOTA_FLOOR;
+  $("ecQuotaBar").parentElement.classList.toggle("under", under);
+  $("ecQuotaNote").textContent = !D.built
+    ? "The 30% floor is a product rule, not an accident — it is what makes this a supply-side growth feature instead of a rich-get-richer loop."
+    : under
+      ? "Below the 30% floor. In production the DJ would refill the set rather than serve it — skipping new artists cannot be allowed to quietly switch the growth engine off."
+      : "Clearing the 30% floor. Every one of those streams pays 1.5×, funded by the sponsor slot rather than by the other artists.";
+}
+
+/* ---- the build pipeline, mirroring the podcast one ---- */
+function buildSet(silent){
+  if (D.running) return;
+  if (!D.ctx){ toast("Pick a listening context first"); return; }
+  D.running = true;
+  D.built = false; renderSet();
+
+  const pipe = $("djPipe"), bar = $("djBar"), steps = [...pipe.querySelectorAll(".step")];
+  pipe.classList.add("on");
+  steps.forEach(s => s.className = "step");
+  $("djBuild").disabled = true;
+
+  const total = REDUCED ? 500 : (silent ? 1200 : 2600);
+  const marks = [.4, .74, 1];
+  const start = Date.now();
+  const iv = setInterval(() => {
+    const p = Math.min(1, (Date.now() - start) / total);
+    bar.style.width = (p * 100) + "%";
+    steps.forEach((s, i) => {
+      s.classList.toggle("done", p >= marks[i]);
+      s.classList.toggle("active", p < marks[i] && (i === 0 || p >= marks[i - 1]));
+      s.textContent = (p >= marks[i] ? "● " : "◦ ") + s.textContent.slice(2);
+    });
+    if (p >= 1){
+      clearInterval(iv); D.running = false;
+      D.set = composeSet(); D.built = true;
+      $("djBuild").disabled = false;
+      $("djBuild").textContent = "Rebuild the set";
+      $("djSpeakBtn").disabled = false;
+      $("djTitle").textContent = `${D.ctx.label} · ${D.set.length} in the queue`;
+      $("djLine").textContent = D.ctx.line;
+      renderSet();
+      setTimeout(() => pipe.classList.remove("on"), REDUCED ? 200 : 1200);
+      const em = D.set.filter(t => t.tier === "emerging").length;
+      toast(`Set built — ${em} of ${D.set.length} from artists under 50k listeners`);
+    }
+  }, 80);
+}
+
+/* ---- the DJ speaks the set ---- */
+function djSpeak(){
+  if (!("speechSynthesis" in window)){ toast("This browser can't speak — the commentary is written out above"); return; }
+  const live = D.set.filter(t => !t.skipped);
+  if (!live.length){ toast("Nothing left in the set to talk over"); return; }
+  const script = `Here is your ${D.ctx.label.toLowerCase()} set. ` +
+    live.slice(0, 4).map(t => `${t.say} That's ${t.t}, by ${t.a}.`).join(" ");
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(script);
+  u.rate = 1.02;
+  const v = window.speechSynthesis.getVoices().find(v => /en[-_]/i.test(v.lang));
+  if (v) u.voice = v;
+  u.onend = () => { $("djOrb").classList.remove("live"); $("djStopBtn").disabled = true; };
+  window.speechSynthesis.speak(u);
+  $("djOrb").classList.add("live");
+  $("djStopBtn").disabled = false;
+}
+function djStop(){
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  $("djOrb").classList.remove("live"); $("djStopBtn").disabled = true;
+}
+
+/* ---- surface switching ---- */
+function setSurface(which){
+  const music = which === "music";
+  $("surface-pod").hidden = music;
+  $("surface-music").hidden = !music;
+  $("surfPod").setAttribute("aria-pressed", String(!music));
+  $("surfMusic").setAttribute("aria-pressed", String(music));
+  if (music){ pause(); stopSpeak(); } else { djStop(); }
+  S.surface = which;
+  toast(music ? "Music — AI DJ" : "Podcasts — chapters and recaps");
+}
+
+$("surfPod").onclick   = () => setSurface("pod");
+$("surfMusic").onclick = () => setSurface("music");
+$("djBuild").onclick   = () => buildSet(false);
+$("djSpeakBtn").onclick = djSpeak;
+$("djStopBtn").onclick  = djStop;
+$("djReset").onclick = () => {
+  djStop(); D.built = false; D.set = []; D.ctx = null;
+  $("djBuild").textContent = "Build my set";
+  $("djSpeakBtn").disabled = true;
+  $("djTitle").textContent = "Nothing queued";
+  $("djLine").textContent = "Pick the moment you're listening in, and the DJ builds a set around it.";
+  $("djPipe").classList.remove("on");
+  renderContexts(); renderSet();
+  toast("Music side reset — ready to demo again");
+};
+
+/* the space bar should only drive the podcast player, not both surfaces */
+S.surface = "pod";
+
+/* ---- flywheel lights up in sequence when it scrolls into view ---- */
+if ("IntersectionObserver" in window){
+  const fio = new IntersectionObserver(entries => {
+    for (const en of entries){
+      if (!en.isIntersecting) continue;
+      fio.unobserve(en.target);
+      const steps = [...en.target.querySelectorAll(".fw-step")];
+      if (REDUCED || document.hidden){ steps.forEach(s => s.classList.add("lit")); return; }
+      steps.forEach((s, i) => setTimeout(() => s.classList.add("lit"), i * 260));
+    }
+  }, { threshold: 0.45 });
+  fio.observe($("flywheel"));
+}
+
+renderContexts();
+renderSet();
 </script>
 </body>
 </html>
