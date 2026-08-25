@@ -6,6 +6,9 @@ Prototype of the AI feature proposed on slide 10 of the Group 3 Digital Product 
 Single static page, no build step, no dependencies, no API keys. Works offline once loaded
 (the only network call is the Google Fonts stylesheet).
 
+**Live demo — open this in class:** https://spotify-highlights-g3.netlify.app
+**Source:** https://github.com/NGB147/spotify-highlights
+
 ---
 
 ## What it demonstrates
@@ -27,24 +30,26 @@ All shows, episodes and listening data are invented; nothing is scraped from rea
 
 ## Deploying
 
-### Option A — Netlify Drop (fastest, ~30 seconds)
-1. Go to https://app.netlify.com/drop
-2. Drag the **whole folder** onto the page.
-3. Rename the site under **Site configuration → Change site name** (e.g. `spotify-highlights-g3`).
+Already set up. The repo is `NGB147/spotify-highlights` and it is deployed to the Netlify
+project `spotify-highlights-g3` (team *Gladiator*). `netlify.toml` sets the publish directory
+to `.` with no build command, since there is nothing to build.
 
-### Option B — GitHub + Netlify (better for the professor, shows version history)
+**To publish a change:**
 ```bash
-cd spotify-highlights
-git init
-git add .
-git commit -m "Spotify Highlights prototype — DPM Group 3"
-git branch -M main
-git remote add origin https://github.com/<your-username>/spotify-highlights.git
-git push -u origin main
+git add . && git commit -m "your message" && git push
 ```
-Then in Netlify: **Add new site → Import an existing project → GitHub → pick the repo.**
-Leave the build command empty and set the publish directory to `.` (a `netlify.toml` in this
-folder already does that for you). Every push redeploys automatically.
+```bash
+netlify deploy --prod --dir .
+```
+
+The Netlify project is linked to this folder via `.netlify/state.json`, which is gitignored —
+so the deploy command works from this machine. The site is **not** wired to auto-deploy on push
+yet; that needs Netlify's GitHub app authorised once under
+**Project configuration → Build & deploy → Link repository**. Until then, the two commands
+above are the publish step.
+
+**If everything falls over ten minutes before class:** go to https://app.netlify.com/drop and
+drag this folder onto the page. That gives you a working URL with no git and no CLI involved.
 
 ---
 
